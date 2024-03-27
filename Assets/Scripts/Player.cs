@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,21 +19,25 @@ public class Player : MonoBehaviour{
     bool skillCol;
     bool HammerCool;
     bool SwordCool;
+    bool isMove;
+    bool isJump;
     SpriteRenderer spriteRenderer;
     Rigidbody2D rigid;
     Animator anim;
     Enemy enemy;
     void Awake() {
         rigid = GetComponent<Rigidbody2D>(); 
-        spriteRenderer = GetComponent<SpriteRenderer>();  
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();  
         anim = GetComponent<Animator>();
         enemy = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
     }
     void Update() {
-        if(Input.GetButtonDown("Vertical"))
+        if(Input.GetButtonDown("Vertical") && !isJump){
+            isJump =true;
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+
+        }
         if(Input.GetButtonUp("Horizontal")){
-            
             rigid.velocity = new Vector2(rigid.velocity.normalized.x * 0.5f,rigid.velocity.y);
         }
         if(Input.GetButton("Horizontal")){
@@ -49,12 +54,18 @@ public class Player : MonoBehaviour{
 
         rigid.AddForce(Vector2.right * h, ForceMode2D.Impulse);
 
-        if(rigid.velocity.x > maxSpeed){//rigit max  speed
+        if(rigid.velocity.x > maxSpeed){
             rigid.velocity = new Vector2(maxSpeed,rigid.velocity.y);
         }else if(rigid.velocity.x < maxSpeed * (-1)){ //left maxspeed계산을 위해 maxSpeed가 음수로 받게함
             rigid.velocity = new Vector2(maxSpeed*(-1),rigid.velocity.y);
         }
+        // bool isGrounded = CheckGrounded();
+        if(checkGrounded()){
+            isJump = false;
+        }
+        
     }
+
     void Skill(){
         if(!skillCol){
             if(Input.GetKey(KeyCode.A)&& Input.GetKey(KeyCode.S)){
@@ -62,34 +73,42 @@ public class Player : MonoBehaviour{
                 isSkill = true;
                 skillCol = true;
                 CreateBullet();
-                
             }
         }
     }
     void AtkSword(){
-        if(Input.GetButtonDown("AtkSword")&&(!isSkill)&&(!SwordCool)){
+        if(Input.GetButtonDown("AtkSword")&&(!isSkill)&&(!SwordCool)&&(!HammerCool)){
             Sword.SetActive(true);
             Hammer.SetActive(false);
-            anim.SetTrigger("doSWD");
-            SwordCool = true;
+            if(isJump){
+                anim.SetBool("isJump",true);
+                anim.SetBool("Sword",true);
+            }
+            if(!isJump){
+                anim.SetTrigger("doSWD");
+            }
             AtkCool("Sword");
         }
     }
     
     void AtkHammer(){
-        if(Input.GetButtonDown("AtkHammer")&&(!isSkill)&&(!HammerCool)){
+        if(Input.GetButtonDown("AtkHammer")&&(!isSkill)&&(!HammerCool)&&(!SwordCool)){
             Sword.SetActive(false);
             Hammer.SetActive(true);
-            anim.SetTrigger("doHAM");
-            HammerCool = true;
+            if(isJump){
+                anim.SetBool("isJump",true);
+                anim.SetBool("Hammer",true);
+            }
+            if(!isJump){
+                anim.SetTrigger("doHAM");
+            }
             AtkCool("Hammer");
         }
     }
     void AtkCool(string AtkEnum){
         if(AtkEnum == "Hammer"){
             HammerCool = true;
-            StartCoroutine("HammerCooldown");
-            
+            StartCoroutine("HammerCooldown");   
         }
         else if(AtkEnum == "Sword"){
             SwordCool = true;
@@ -97,10 +116,16 @@ public class Player : MonoBehaviour{
         }
     }
     IEnumerator HammerCooldown(){
+        if(anim.GetBool("isJump")){
+            yield return StartCoroutine(GroundCheck());
+        }
         yield return new WaitForSeconds(0.5f);
         HammerCool = false;
     }
     IEnumerator SwordCooldown(){
+        if(anim.GetBool("isJump")){
+            yield return StartCoroutine(GroundCheck());
+        }
         yield return new WaitForSeconds(0.4f);
         SwordCool = false;
     }
@@ -111,20 +136,16 @@ public class Player : MonoBehaviour{
         GameObject bullet = Instantiate(bulletobj, bulletPosition, bulletRotation);
 
         Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
-        if(bulletRigidbody != null)
-        {
+        if(bulletRigidbody != null){
             bulletRigidbody.AddForce(transform.right * 20, ForceMode2D.Impulse);
         }
 
         isSkill = false;
         StartCoroutine("ResetFiring");
-        
+    
         Destroy(bullet,5);
-        
     }
-    IEnumerator ResetFiring()
-    {
-
+    IEnumerator ResetFiring(){
         yield return new WaitForSeconds(0.5f);
 
         if (enemy != null && enemy.isEnter)
@@ -134,13 +155,11 @@ public class Player : MonoBehaviour{
             maxSpeed = tempspeed;
             Transform enemyTransform = GameObject.FindWithTag("Enemy").transform;
             Debug.Log("이동");
-            // 적에게 바로 붙도록 방향을 설정합니다.
             Vector2 directionToEnemy = (enemyTransform.position - transform.position).normalized;
             directionToEnemy.y = 0;
-            rigid.velocity = directionToEnemy * 15; // 적에게 바로 붙도록 속도를 설정합니다.
+            rigid.velocity = directionToEnemy * 15; 
             Debug.Log("이동2");
             Debug.Log(directionToEnemy+":diretenemy");
-            // Debug.Log(+":diretenemy");
             
             yield return new WaitForSeconds(1f);
             maxSpeed = originalspeed;
@@ -151,5 +170,30 @@ public class Player : MonoBehaviour{
         }
         yield return new WaitForSeconds(3f);
         skillCol = false;
+    }
+    bool checkGrounded() {
+        Debug.DrawRay(rigid.position, Vector2.down, new Color(0, 1, 0));
+        Vector2 raycastStart = rigid.position - Vector2.up * 1f;
+        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.down, 1, LayerMask.GetMask("Floor"));
+        if(rigid.velocity.y < 0){
+            if (rayHit.collider != null && rayHit.distance < 0.3f) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+    IEnumerator GroundCheck(){
+        while(!checkGrounded()){
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log("지면 도착");
+
+        anim.SetBool("isJump",false);
+        anim.SetBool("Sword",false);
+        anim.SetBool("Hammer",false);
+        
     }
 }
