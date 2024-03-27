@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+// using System.Diagnostics;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public enum Type{Shiled, normal};
+    public Type enemyType;
     public int maxHealth;
     public int curHelath;
     public SpriteRenderer[] sprite;
@@ -20,10 +23,17 @@ private void OnTriggerEnter2D(Collider2D other) {
         Debug.Log("해머인식");
         Player weapon = other.GetComponentInParent<Player>();
         if(weapon != null){
-            curHelath -= weapon.Hammerdamgae;
+            switch(enemyType){
+                case Type.normal:
+                    curHelath -= weapon.Hammerdamgae;
+                break;
+                case Type.Shiled:
+                    curHelath -= weapon.Hammerdamgae + 5;
+                break;
+        }
             Debug.Log("데미지받음");
             Vector3 reactVec = transform.position - other.transform.position;
-            StartCoroutine(OnDamage(reactVec,false));
+            StartCoroutine(OnDamage(reactVec));
             Debug.Log("데미지받음");
         }
 
@@ -32,10 +42,18 @@ private void OnTriggerEnter2D(Collider2D other) {
         Debug.Log("해머인식");
         Player weapon = other.GetComponentInParent<Player>();
         if(weapon != null){
-            curHelath -= weapon.Sworddamage;
-            Vector3 reactVec = transform.position - other.transform.position;
-            StartCoroutine(OnDamage(reactVec,false));
+            switch(enemyType){
+                case Type.normal:
+                    curHelath -= weapon.Sworddamage + 3;
+                break;
+                case Type.Shiled:
+                    curHelath -= weapon.Sworddamage;
+                break;
         }
+            Vector3 reactVec = transform.position - other.transform.position;
+            StartCoroutine(OnDamage(reactVec));
+        }
+
     } 
     else if(other.tag == "Bullet"){
             bullet bulletd = other.GetComponent<bullet>();
@@ -47,7 +65,7 @@ private void OnTriggerEnter2D(Collider2D other) {
                 isEnter = true;
                 Destroy(other.gameObject);
 
-                StartCoroutine(OnDamage(reactVec,false));
+                StartCoroutine(OnDamage(reactVec));
                 if(isEnter){
                     StartCoroutine("DestroySwd");
                 }
@@ -58,7 +76,7 @@ private void OnTriggerEnter2D(Collider2D other) {
         }
     }
 
-    IEnumerator OnDamage(Vector3 reactVec, bool isGrenade){
+    IEnumerator OnDamage(Vector3 reactVec){
         foreach(SpriteRenderer mesh in sprite)
             mesh.color = Color.red;
         yield return new WaitForSeconds(0.1f);
@@ -75,6 +93,7 @@ private void OnTriggerEnter2D(Collider2D other) {
             gameObject.layer = 12;
             isDead = true;
         }
+
     }
     IEnumerator DestroySwd(){
         yield return new WaitForSeconds(5f);
