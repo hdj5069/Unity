@@ -100,7 +100,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c3c2db3ba87c0c49a385f77b14d3aae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arrowPrefab: {fileID: 0}
+  arrowOffset: 0.5
   bulletdamgae: 3
+  type: 1
 --- !u!50 &1658356526655711079
 Rigidbody2D:
   serializedVersion: 4

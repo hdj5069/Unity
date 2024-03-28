@@ -58,21 +58,25 @@ private void OnTriggerEnter2D(Collider2D other) {
     else if(other.tag == "Bullet"){
             bullet bulletd = other.GetComponent<bullet>();
             if(bulletd != null){
-                curHelath -= bulletd.bulletdamgae;
-                Debug.Log("총알닿음?");
-                Vector3 reactVec = transform.position - other.transform.position;
-                MSword.SetActive(true);
-                isEnter = true;
-                Destroy(other.gameObject);
+                if(bulletd.type == bullet.Type.Arrow){
+                    curHelath -= bulletd.bulletdamgae;
+                    Debug.Log("총알닿음?");
+                }
+                else if(bulletd.type == bullet.Type.Skill){
+                    curHelath -= bulletd.bulletdamgae;
+                    Debug.Log("총알닿음?");
+                    Vector3 reactVec = transform.position - other.transform.position;
+                    MSword.SetActive(true);
+                    isEnter = true;
+                    Destroy(other.gameObject);
 
-                StartCoroutine(OnDamage(reactVec));
-                if(isEnter){
-                    StartCoroutine("DestroySwd");
+                    StartCoroutine(OnDamage(reactVec));
+                    if(isEnter){
+                        StartCoroutine("DestroySwd");
+                        Debug.Log("dddd");
+                    }
                 }
             }
-        }
-        else{
-            Debug.Log("아무도안맞음");
         }
     }
 
@@ -96,6 +100,8 @@ private void OnTriggerEnter2D(Collider2D other) {
 
     }
     IEnumerator DestroySwd(){
+        yield return new WaitForSeconds(0.5f);
+        isEnter = false;
         yield return new WaitForSeconds(5f);
         MSword.SetActive(false);
     }
