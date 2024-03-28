@@ -20,7 +20,6 @@ public class Enemy : MonoBehaviour
     }
 private void OnTriggerEnter2D(Collider2D other) {
     if(other.tag =="Hammer"){
-        Debug.Log("해머인식");
         Player weapon = other.GetComponentInParent<Player>();
         if(weapon != null){
             switch(enemyType){
@@ -39,7 +38,6 @@ private void OnTriggerEnter2D(Collider2D other) {
 
     }
     else if(other.tag =="Sword"){
-        Debug.Log("해머인식");
         Player weapon = other.GetComponentInParent<Player>();
         if(weapon != null){
             switch(enemyType){
@@ -60,11 +58,11 @@ private void OnTriggerEnter2D(Collider2D other) {
             if(bulletd != null){
                 if(bulletd.type == bullet.Type.Arrow){
                     curHelath -= bulletd.bulletdamgae;
-                    Debug.Log("총알닿음?");
+                    Debug.Log("총알닿음2?");
                 }
                 else if(bulletd.type == bullet.Type.Skill){
                     curHelath -= bulletd.bulletdamgae;
-                    Debug.Log("총알닿음?");
+                    Debug.Log("총알닿음1?");
                     Vector3 reactVec = transform.position - other.transform.position;
                     MSword.SetActive(true);
                     isEnter = true;

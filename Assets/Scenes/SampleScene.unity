@@ -8521,7 +8521,8 @@ MonoBehaviour:
   Hammerdamgae: 10
   Sworddamage: 5
   bulletdamgae: 3
-  bulletobj: {fileID: 506825358989738384, guid: d6562b7770a3661478e1fc33d9da706a, type: 3}
+  bulletObj: {fileID: 7737148279669808546, guid: d58c4395c1fe1c84cb4e8746e1eba539, type: 3}
+  SkillObj: {fileID: 506825358989738384, guid: d6562b7770a3661478e1fc33d9da706a, type: 3}
   jumphammer: {fileID: 4990347158519348705}
   jumpSword: {fileID: 1389708514}
   HammerCollider: {fileID: 6863142852977348974}
