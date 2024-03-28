@@ -12,7 +12,13 @@ public class Player : MonoBehaviour{
     public int Hammerdamgae;
     public int Sworddamage;
     public int bulletdamgae;
-    public GameObject bulletobj;
+    public GameObject bulletObj;
+    public GameObject SkillObj;
+    public BoxCollider2D jumphammer;
+    public BoxCollider2D jumpSword;
+    public BoxCollider2D HammerCollider;
+    public BoxCollider2D SwordCollider;
+    public ParticleSystem Hammerparticle; 
     float originalspeed;
     float tempspeed = 100;
     bool isSkill;
@@ -44,6 +50,7 @@ public class Player : MonoBehaviour{
             spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;//움직이는 값이 -일 때 flipx를 바꿔라
         }
         Skill();
+        AtkArrow();
         AtkHammer();
         AtkSword();
 
@@ -67,32 +74,45 @@ public class Player : MonoBehaviour{
     }
 
     void Skill(){
-        if(!skillCol){
-            if(Input.GetKey(KeyCode.A)&& Input.GetKey(KeyCode.S)){
-                Debug.Log("A와 S키가 동시에 눌렀습니다.");
-                isSkill = true;
-                skillCol = true;
+        if(Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)){
+            if(!skillCol){
+            Debug.Log("A와 S키가 동시에 눌렀습니다.");
+            isSkill = true;
+            skillCol = true;
+            CreateBullet();
+            }
+        }
+    }
+    void AtkArrow(){
+        if(Input.GetButtonDown("AtkArrow")&&(!SwordCool)&&(!HammerCool)){
+            if(isSkill){
+
+                Sword.SetActive(false);
+                Hammer.SetActive(false);
                 CreateBullet();
+                AtkCool("Arrow");
             }
         }
     }
     void AtkSword(){
-        if(Input.GetButtonDown("AtkSword")&&(!isSkill)&&(!SwordCool)&&(!HammerCool)){
+        if(Input.GetButtonDown("AtkSword")&&(isSkill)&&(!SwordCool)&&(!HammerCool)){
             Sword.SetActive(true);
             Hammer.SetActive(false);
             if(isJump){
                 anim.SetBool("isJump",true);
                 anim.SetBool("Sword",true);
+                jumpSword.enabled = true;
             }
             if(!isJump){
                 anim.SetTrigger("doSWD");
+                SwordCollider.enabled =true;
             }
             AtkCool("Sword");
         }
     }
     
     void AtkHammer(){
-        if(Input.GetButtonDown("AtkHammer")&&(!isSkill)&&(!HammerCool)&&(!SwordCool)){
+        if(Input.GetButtonDown("AtkHammer")&&(isSkill)&&(!HammerCool)&&(!SwordCool)){
             Sword.SetActive(false);
             Hammer.SetActive(true);
             if(isJump){
@@ -100,6 +120,7 @@ public class Player : MonoBehaviour{
                 anim.SetBool("Hammer",true);
             }
             if(!isJump){
+                HammerCollider.enabled = true;
                 anim.SetTrigger("doHAM");
             }
             AtkCool("Hammer");
@@ -114,10 +135,20 @@ public class Player : MonoBehaviour{
             SwordCool = true;
             StartCoroutine("SwordCooldown");
         }
+        else if(AtkEnum == "Arrow"){
+            SwordCool = true;
+            StartCoroutine("SwordCooldown");
+        }
     }
     IEnumerator HammerCooldown(){
         if(anim.GetBool("isJump")){
+            yield return new WaitForSeconds(0.2f);
+            jumphammer.enabled = true;
             yield return StartCoroutine(GroundCheck());
+        }
+        else{
+            yield return new WaitForSeconds(0.2f);
+            HammerCollider.enabled = false;
         }
         yield return new WaitForSeconds(0.5f);
         HammerCool = false;
@@ -126,30 +157,45 @@ public class Player : MonoBehaviour{
         if(anim.GetBool("isJump")){
             yield return StartCoroutine(GroundCheck());
         }
-        yield return new WaitForSeconds(0.4f);
+        else{
+            yield return new WaitForSeconds(0.4f);
+            SwordCollider.enabled = false;
+        }
         SwordCool = false;
     }
     void CreateBullet()
     {
-        Vector3 bulletPosition = transform.position + transform.up * 1f;
-        Quaternion bulletRotation = Quaternion.Euler(0f,0f,-80f);
-        GameObject bullet = Instantiate(bulletobj, bulletPosition, bulletRotation);
+        if(isSkill){
+            Vector3 bulletPosition = transform.position + transform.up * 1f;
+            Quaternion bulletRotation = Quaternion.Euler(0f,0f,-80f);
+            
+            GameObject bullet = Instantiate(SkillObj, bulletPosition, bulletRotation);
 
-        Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
-        if(bulletRigidbody != null){
-            bulletRigidbody.AddForce(transform.right * 20, ForceMode2D.Impulse);
+            Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
+            if(bulletRigidbody != null){
+                bulletRigidbody.AddForce(transform.right * 20, ForceMode2D.Impulse);
+            }
+            isSkill = false;
+            StartCoroutine("ResetFiring");
+        
+            Destroy(bullet,5);
         }
-
-        isSkill = false;
-        StartCoroutine("ResetFiring");
-    
-        Destroy(bullet,5);
+        else if(!isSkill){
+            Vector3 bulletPosition = transform.position + transform.up * 0.3f;
+            GameObject bullet = Instantiate(bulletObj,bulletPosition,Quaternion.identity);
+            Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
+            if(bulletRigidbody != null){
+                bulletRigidbody.AddForce(transform.right * 20, ForceMode2D.Impulse);
+            }
+        }
     }
     IEnumerator ResetFiring(){
         yield return new WaitForSeconds(0.5f);
-
-        if (enemy != null && enemy.isEnter)
-        {
+        // yield return StartCoroutine(SkillCheck());
+        Debug.Log("외부?");  
+        if (enemy != null && enemy.isEnter){
+            
+            Debug.Log("내부?");  
             Debug.Log(enemy.isEnter);
             originalspeed = maxSpeed;
             maxSpeed = tempspeed;
@@ -166,6 +212,8 @@ public class Player : MonoBehaviour{
         }
         else
         {
+            Debug.Log(enemy);
+            Debug.Log(enemy.isEnter);
             Debug.Log("No enemy or enemy is not in range.");
         }
         yield return new WaitForSeconds(3f);
@@ -190,10 +238,25 @@ public class Player : MonoBehaviour{
         }
         yield return new WaitForSeconds(0.1f);
         Debug.Log("지면 도착");
-
-        anim.SetBool("isJump",false);
+        if(jumphammer.enabled == true){
+            // var emission = Hammerparticle.enableEmission;
+            // emission.enabled = true;
+            Hammerparticle.enableEmission = true;
+        }
         anim.SetBool("Sword",false);
         anim.SetBool("Hammer",false);
+        jumphammer.enabled = false;
         
+        SwordCollider.enabled =false;
+        yield return new WaitForSeconds(0.3f);
+        anim.SetBool("isJump",false);
+        Hammerparticle.enableEmission = false;
     }
+    // IEnumerator SkillCheck(){
+    //     while(!enemy.isEnter){
+    //         yield return null;
+    //     }
+    //     yield return new WaitForSeconds(0.1f);
+        
+    // }
 }
