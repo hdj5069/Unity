@@ -20,20 +20,20 @@ public class bullet : MonoBehaviour{
         if(collision.gameObject.tag == "Wall"){
             Destroy(gameObject);
         }
-        // if(collision.CompareTag("Enemy")){
-        //     if(type == Type.Arrow){
-        //         Vector3 collisionPoint = collision.ClosestPoint(transform.position);
-        //         Vector3 direction = (collisionPoint - transform.position).normalized;
-        //         Vector3 arrowPosition = collisionPoint - direction * arrowOffset;
+        if(collision.CompareTag("Enemy")){
+            if(type == Type.Arrow){
+                Vector3 collisionPoint = collision.ClosestPoint(transform.position);
+                Vector3 direction = (collisionPoint - transform.position).normalized;
+                Vector3 arrowPosition = collisionPoint - direction * arrowOffset;
 
-        //         GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
+                GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
 
-        //         newArrow.transform.parent = collision.transform;
+                newArrow.transform.parent = collision.transform;
 
-        //         Destroy(gameObject);
-        //         Destroy(newArrow,5);
-        //     }
-        // }
+                Destroy(gameObject);
+                Destroy(newArrow,5);
+            }
+        }
     }
 }
    

@@ -76,26 +76,26 @@ public class Player : MonoBehaviour{
     void Skill(){
         if(Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)){
             if(!skillCol){
-            Debug.Log("A와 S키가 동시에 눌렀습니다.");
-            isSkill = true;
-            skillCol = true;
-            CreateBullet();
+                Debug.Log("A와 S키가 동시에 눌렀습니다.");
+                isSkill = true;
+                skillCol = true;
+                CreateBullet();
             }
         }
     }
     void AtkArrow(){
         if(Input.GetButtonDown("AtkArrow")&&(!SwordCool)&&(!HammerCool)){
-            if(isSkill){
+            if(!isSkill){
+            Sword.SetActive(false);
+            Hammer.SetActive(false);
+            CreateBullet();
+            AtkCool("Arrow");
 
-                Sword.SetActive(false);
-                Hammer.SetActive(false);
-                CreateBullet();
-                AtkCool("Arrow");
             }
         }
     }
     void AtkSword(){
-        if(Input.GetButtonDown("AtkSword")&&(isSkill)&&(!SwordCool)&&(!HammerCool)){
+        if(Input.GetButtonDown("AtkSword")&&(!isSkill)&&(!SwordCool)&&(!HammerCool)){
             Sword.SetActive(true);
             Hammer.SetActive(false);
             if(isJump){
@@ -112,7 +112,7 @@ public class Player : MonoBehaviour{
     }
     
     void AtkHammer(){
-        if(Input.GetButtonDown("AtkHammer")&&(isSkill)&&(!HammerCool)&&(!SwordCool)){
+        if(Input.GetButtonDown("AtkHammer")&&(!isSkill)&&(!HammerCool)&&(!SwordCool)){
             Sword.SetActive(false);
             Hammer.SetActive(true);
             if(isJump){
@@ -193,8 +193,8 @@ public class Player : MonoBehaviour{
         yield return new WaitForSeconds(0.5f);
         // yield return StartCoroutine(SkillCheck());
         Debug.Log("외부?");  
-        if (enemy != null && enemy.isEnter){
-            
+        if (enemy != null){
+            // enemy.isEnter = true;
             Debug.Log("내부?");  
             Debug.Log(enemy.isEnter);
             originalspeed = maxSpeed;
@@ -210,8 +210,7 @@ public class Player : MonoBehaviour{
             yield return new WaitForSeconds(1f);
             maxSpeed = originalspeed;
         }
-        else
-        {
+        else{
             Debug.Log(enemy);
             Debug.Log(enemy.isEnter);
             Debug.Log("No enemy or enemy is not in range.");
