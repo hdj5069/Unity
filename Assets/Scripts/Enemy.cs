@@ -10,17 +10,23 @@ public class Enemy : MonoBehaviour
     public int maxHealth;
     public int curHelath;
     public SpriteRenderer[] sprite;
+    public GameObject particle;
     public bool isDead;
     public bool isEnter;
     public Rigidbody2D rigid;
     public GameObject MSword;
     void Awake(){
         sprite = GetComponentsInChildren<SpriteRenderer>();//MeshRenderer에서 material을 뽑아올 때는 소문자로 작성
-        
+
     }
-private void OnTriggerEnter2D(Collider2D other) {
-    if(other.tag =="Hammer"){
-        Player weapon = other.GetComponentInParent<Player>();
+    void Update(){
+        if(enemyType == Type.normal){
+            particle.SetActive(false);
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.tag =="Hammer"){
+            Player weapon = other.GetComponentInParent<Player>();
         if(weapon != null){
             switch(enemyType){
                 case Type.normal:
@@ -30,10 +36,8 @@ private void OnTriggerEnter2D(Collider2D other) {
                     curHelath -= weapon.Hammerdamgae + 5;
                 break;
         }
-            Debug.Log("데미지받음");
             Vector3 reactVec = transform.position - other.transform.position;
             StartCoroutine(OnDamage(reactVec));
-            Debug.Log("데미지받음");
         }
 
     }
@@ -56,27 +60,48 @@ private void OnTriggerEnter2D(Collider2D other) {
     else if(other.tag == "Bullet"){
             bullet bulletd = other.GetComponent<bullet>();
             if(bulletd != null){
-                if(bulletd.type == bullet.Type.Arrow){
-                    curHelath -= bulletd.bulletdamgae;
-                    Debug.Log("총알닿음2?");
-                }
-                else if(bulletd.type == bullet.Type.Skill){
+                if(bulletd.type == bullet.Type.Skill){
+                    isEnter = true;
                     curHelath -= bulletd.bulletdamgae;
                     Debug.Log("총알닿음1?");
                     Vector3 reactVec = transform.position - other.transform.position;
-                    MSword.SetActive(true);
-                    isEnter = true;
-                    Destroy(other.gameObject);
+                    // MSword.SetActive(true);
+                    // Destroy(other.gameObject);
 
                     StartCoroutine(OnDamage(reactVec));
-                    if(isEnter){
-                        StartCoroutine("DestroySwd");
-                        Debug.Log("dddd");
-                    }
+                    
+                    StartCoroutine("DestroySwd");
+                    Debug.Log("dddd");
+                    
+                }else if(bulletd.type == bullet.Type.Arrow){
+                    curHelath -= bulletd.bulletdamgae;
+                    
+                    Vector3 reactVec = transform.position - other.transform.position;
+                    StartCoroutine(OnDamage(reactVec));
+                    Debug.Log("총알닿음2?");
                 }
             }
         }
+        else if(other.tag =="Skill"){
+            Player weapon = other.GetComponentInParent<Player>();
+            if(weapon != null){
+                switch(enemyType){
+                    case Type.normal:
+                        curHelath -= weapon.Sworddamage;
+                    break;
+                    case Type.Shiled:
+                        curHelath -= weapon.Sworddamage;
+                    break;
+            }
+                isEnter = true;
+                Vector3 reactVec = transform.position - other.transform.position;
+                StartCoroutine(OnDamage(reactVec));
+                
+                StartCoroutine("isEnterdel");
+            }
+        } 
     }
+    
 
     IEnumerator OnDamage(Vector3 reactVec){
         foreach(SpriteRenderer mesh in sprite)
@@ -98,9 +123,13 @@ private void OnTriggerEnter2D(Collider2D other) {
 
     }
     IEnumerator DestroySwd(){
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(2.5f);
         isEnter = false;
-        yield return new WaitForSeconds(5f);
-        MSword.SetActive(false);
+        // MSword.SetActive(false);
+    }
+    IEnumerator isEnterdel(){
+        yield return new WaitForSeconds(2.5f);
+        isEnter = false;
+        // MSword.SetActive(false);
     }
 }
