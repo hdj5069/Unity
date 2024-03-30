@@ -5,34 +5,57 @@ using UnityEngine;
 
 public class bullet : MonoBehaviour{
     public GameObject arrowPrefab;
-    public float arrowOffset = 0.5f;
+    public float arrowOffset = 1f;
     public int bulletdamgae;
     public Type type;
     public enum Type{Arrow,Skill}
+    public bool isPenetrate;
+    public List<GameObject> instatarrow = new List<GameObject>();   
+    Player player;
+    public GameManager gameManager;
+
+    private void Awake() {
+        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>(); // 게임 매니저 초기화
+
+    }
 
     void OnCollisionEnter2D(Collision2D collision) {
-        if(collision.gameObject.tag == "Floor"){
-            Destroy(gameObject,3);
-        }
+        
 
     }
     void OnTriggerEnter2D(Collider2D collision) {
         if(collision.gameObject.tag == "Wall"){
             Destroy(gameObject);
         }
+        if(collision.gameObject.tag == "Floor"){
+            Destroy(gameObject);
+        }
         if(collision.CompareTag("Enemy")){
             if(type == Type.Arrow){
+
                 Vector3 collisionPoint = collision.ClosestPoint(transform.position);
-                Vector3 direction = (collisionPoint - transform.position).normalized;
-                Vector3 arrowPosition = collisionPoint - direction * arrowOffset;
+                Vector3 arrowPosition = collisionPoint;
 
-                GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
+                if(isPenetrate){
+                    GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
+                    newArrow.transform.parent = collision.transform;
+                    gameManager.AddArrow(newArrow);
 
-                newArrow.transform.parent = collision.transform;
-
+                    player.a++;
+                                    }
+                    if (gameManager.ArrowCount() > 2)
+                {
+                    GameObject oldestArrow = gameManager.GetOldestArrow();
+                    gameManager.RemoveArrow(oldestArrow);
+                    Destroy(oldestArrow);
+                }
+                    
                 Destroy(gameObject);
-                Destroy(newArrow,5);
-            }
+                    
+                }
+                Destroy(gameObject,5f);
+            
         }
     }
 }

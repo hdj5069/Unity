@@ -8,6 +8,9 @@ TagManager:
   - Hammer
   - Sword
   - Bullet
+  - Skill
+  - GameManager
+  - Floor
   layers:
   - Default
   - TransparentFX
