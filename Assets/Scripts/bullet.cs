@@ -43,18 +43,18 @@ public class bullet : MonoBehaviour{
                     gameManager.AddArrow(newArrow);
 
                     player.a++;
-                                    }
+                
                     if (gameManager.ArrowCount() > 2)
-                {
-                    GameObject oldestArrow = gameManager.GetOldestArrow();
-                    gameManager.RemoveArrow(oldestArrow);
-                    Destroy(oldestArrow);
-                }
-                    
+                    {
+                        GameObject oldestArrow = gameManager.GetOldestArrow();
+                        gameManager.RemoveArrow(oldestArrow);
+                        Destroy(oldestArrow);
+                    }
                 Destroy(gameObject);
-                    
                 }
+                    
                 Destroy(gameObject,5f);
+                }
             
         }
     }

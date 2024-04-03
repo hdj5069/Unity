@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-// using System.Diagnostics;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
     public enum Type{Shiled, normal};
     public Type enemyType;
-    public int maxHealth;
+    public int maxHealth = 100;
     public int curHelath;
     public SpriteRenderer[] sprite;
     public GameObject particle;
@@ -84,6 +83,7 @@ public class Enemy : MonoBehaviour
         }
         else if(other.tag =="Skill"){
             Player weapon = other.GetComponentInParent<Player>();
+            
             if(weapon != null){
                 switch(enemyType){
                     case Type.normal:
@@ -93,15 +93,25 @@ public class Enemy : MonoBehaviour
                         curHelath -= weapon.Sworddamage;
                     break;
             }
-                isEnter = true;
+                if(weapon.isHammer){
+                    isEnter = true;
+                    
+                    StartCoroutine("isEnterdel");
+                }
                 Vector3 reactVec = transform.position - other.transform.position;
+                    
                 StartCoroutine(OnDamage(reactVec));
-                
-                StartCoroutine("isEnterdel");
             }
         } 
     }
-    
+    // public void SkillDamage(string SkillEnum){
+    //     if(SkillEnum == "Skill2"){
+
+    //         Vector3 reactVec = transform.position - other.transform.position;
+    //         OnDamage(reactVec);
+    //     }
+        
+    // }
 
     IEnumerator OnDamage(Vector3 reactVec){
         foreach(SpriteRenderer mesh in sprite)
@@ -119,8 +129,20 @@ public class Enemy : MonoBehaviour
                 mesh.color = Color.gray;
             gameObject.layer = 12;
             isDead = true;
+            Die();
         }
 
+    }
+    public void TakeDamage(int damageAmount)
+    {
+        curHelath -= damageAmount;
+        
+        StartCoroutine(OnDamage(Vector3.zero)); // OnDamage 함수를 호출하여 피해를 입힙니다.
+    
+    }
+    void Die()
+    {
+        Destroy(gameObject);
     }
     IEnumerator DestroySwd(){
         yield return new WaitForSeconds(2.5f);

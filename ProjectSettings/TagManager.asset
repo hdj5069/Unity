@@ -11,6 +11,7 @@ TagManager:
   - Skill
   - GameManager
   - Floor
+  - Bow
   layers:
   - Default
   - TransparentFX
