@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     public bool isEnter;
     public Rigidbody2D rigid;
     public GameObject MSword;
+    Player player;
     void Awake(){
         sprite = GetComponentsInChildren<SpriteRenderer>();//MeshRenderer에서 material을 뽑아올 때는 소문자로 작성
 
@@ -64,11 +65,9 @@ public class Enemy : MonoBehaviour
                     curHelath -= bulletd.bulletdamgae;
                     Debug.Log("총알닿음1?");
                     Vector3 reactVec = transform.position - other.transform.position;
-                    // MSword.SetActive(true);
-                    // Destroy(other.gameObject);
 
                     StartCoroutine(OnDamage(reactVec));
-                    
+                    Destroy(other.gameObject);
                     StartCoroutine("DestroySwd");
                     Debug.Log("dddd");
                     
@@ -97,6 +96,10 @@ public class Enemy : MonoBehaviour
                     isEnter = true;
                     
                     StartCoroutine("isEnterdel");
+                }
+                if(weapon.isSkill){
+                    Destroy(weapon);
+                    StartCoroutine("DestroySwd");
                 }
                 Vector3 reactVec = transform.position - other.transform.position;
                     
@@ -131,7 +134,6 @@ public class Enemy : MonoBehaviour
             isDead = true;
             Die();
         }
-
     }
     public void TakeDamage(int damageAmount)
     {
