@@ -35,9 +35,11 @@ public class Player : MonoBehaviour{
     bool skillCol1;
     bool isSkill2;
     bool isSkill3;
+    public bool isSkil4;
     bool skillCol2;
     float holdingkey = 0f;
     bool isDash;
+    bool isDashCool;
     float pressTime;
     public float curveDuration = 0.1f;
     SpriteRenderer spriteRenderer;
@@ -49,6 +51,7 @@ public class Player : MonoBehaviour{
     bool isasd;
     bool isad;
     bool isas;
+    bool issd;
     public bool isHammer;
     public int a;
     Rigidbody2D rigid;
@@ -106,16 +109,20 @@ public class Player : MonoBehaviour{
         }else if(Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.S)&& !skillCol1 && !isArrow && !SwordCool && !HammerCool &&!isasd){
             Skill1();
             isas = true;
-        }else if(Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)&&!skillCol2 && !isArrow && !SwordCool && !HammerCool&&!isasd&&!isas){
+        }else if(Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D)&& !skillCol1 && !isArrow && !SwordCool && !HammerCool &&!isasd && !isas){
+            issd = true;
+            Skill4();
+        }
+        else if(Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)&&!skillCol2 && !isArrow && !SwordCool && !HammerCool&& !isasd){
             Skill2();
             isad=true;
-        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !SwordCool && !HammerCool && !isArrow){
+        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !SwordCool && !HammerCool && !isArrow&&!isasd&&!isad&&!isas&&!issd){
             OnSword();
             isKeyPressed = true;
             holdingkey = Time.time;
             anim.SetBool("doSword",true);
             anim.SetBool("isCharge",true);
-        }else if(Input.GetButtonUp("AtkSword")&&!isSkill && !SwordCool && !HammerCool && !isArrow){
+        }else if(Input.GetButtonUp("AtkSword")&&!isSkill && !SwordCool && !HammerCool && !isArrow&&!isasd&&!isad&&!isas&&!issd){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
                 if(Pressduration < 1f){
@@ -130,7 +137,7 @@ public class Player : MonoBehaviour{
                 }
                 
             }
-        }else if(Input.GetButtonDown("AtkHammer")&&!isSkill&&!HammerCool&&!SwordCool && !isArrow){
+        }else if(Input.GetButtonDown("AtkHammer")&&!isSkill&&!HammerCool&&!SwordCool && !isArrow&&!isasd&&!isad&&!isas&&!issd){
             isKeyPressed = true;
             // holdingkey = 0;
             holdingkey = Time.time;
@@ -138,7 +145,7 @@ public class Player : MonoBehaviour{
             // if(Input.GetButton("AtkHammer")){
             anim.SetBool("isCharge",true);
             anim.SetBool("doHammer",true);
-        }else if(Input.GetButtonUp("AtkHammer")&&!isSkill&&!HammerCool&&!SwordCool && !isArrow){
+        }else if(Input.GetButtonUp("AtkHammer")&&!isSkill&&!HammerCool&&!SwordCool && !isArrow&&!isasd&&!isad&&!isas&&!issd){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
                 Debug.Log(Pressduration);
@@ -156,13 +163,12 @@ public class Player : MonoBehaviour{
                 }
             }
             isKeyPressed = false;
-            isMove= false;
-        }else if(Input.GetButtonDown("AtkArrow")&& !SwordCool && !HammerCool && !isArrow&& !isSkill){
+        }else if(Input.GetButtonDown("AtkArrow")&& !SwordCool && !HammerCool && !isArrow&& !isSkill&&!isasd&&!isad&&!isas&&!issd){
             OnBow();
             anim.SetTrigger("doShot");
             isKeyPressed = true;
             holdingkey = Time.time;
-        }else if(Input.GetButtonUp("AtkArrow")&& !SwordCool && !HammerCool && !isArrow&& !isSkill){
+        }else if(Input.GetButtonUp("AtkArrow")&& !SwordCool && !HammerCool && !isArrow&& !isSkill&&!isasd&&!isad&&!isas&&!issd){
             float Pressduration = Time.time - holdingkey;
             if(isKeyPressed && Pressduration >= 1f){
             Debug.Log("화살");
@@ -173,10 +179,12 @@ public class Player : MonoBehaviour{
             else{
                 AtkArrow();
             }
-        }else if(Input.GetButtonDown("Dash")&& !isDash){
+        }else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool){
             isDash = true;
-            isMove = true;
+            // isMove = true;
+            isDashCool = true;
             Vector2 dashDirection = new Vector2(-transform.localScale.x, 0f).normalized;
+            // rigid.gravityScale = 0f;
             Vector2 startPos = rigid.position;
             float dashSpeed = 50f;
             float maxDash = 5f;
@@ -186,8 +194,13 @@ public class Player : MonoBehaviour{
     }
     void DashOut(){
         isDash = false;
-        isMove = false;
+        // isMove = false;
+        // rigid.gravityScale = 1f;
         rigid.velocity = Vector2.zero;
+        Invoke("DashCool",2f);
+    }
+    void DashCool(){
+        isDashCool = false;
     }
     void Skill1(){
         Debug.Log("A와 S키가 동시에 눌렀습니다.");
@@ -205,8 +218,17 @@ public class Player : MonoBehaviour{
         StartCoroutine("ActionSkill2");
     }
     void Skill3(){
+        Debug.Log("ASD");
         isSkill3 = true;
         CreateBullet();
+    }
+    void Skill4(){
+        isSkil4 = true;
+        Debug.Log("SD");
+        OnSword();
+
+        // OnHanmmer();
+
     }
     void AtkSword(){
         OnSword();
@@ -219,9 +241,7 @@ public class Player : MonoBehaviour{
             anim.SetTrigger("doSWD");
             SwordCollider.enabled =true;
         }
-        
         AtkCool("Sword");
-        
     }
     
     void AtkHammer(){
@@ -314,16 +334,14 @@ public class Player : MonoBehaviour{
     }
     IEnumerator Charge(){
         OnBow();
-
+        Debug.Log("들어옴??");
         Vector3 scale = ASskill.transform.localScale;
         if(isArrow){
             scale.y = 0.7f;
-            isMove = true;
             StartCoroutine("ArrowCooldown");
         }
         else if(!isArrow){
             yield return new WaitForSeconds(0.7f);
-            isMove = true;
             Debug.Log("확인");
             scale.y = 3f;
         }
@@ -332,6 +350,7 @@ public class Player : MonoBehaviour{
         StartCoroutine("ResetSkillCool");
     }
     IEnumerator ActionSkill2(){
+        Debug.Log("들어옴?");
         isHammer = true;
         Hammer.tag = "Skill";
         hamtag.tag = "Skill";
@@ -452,11 +471,11 @@ public class Player : MonoBehaviour{
         isSkill2 = false;
         isKeyPressed = false;
         yield return new WaitForSeconds(0.2f);
-        isMove = false;
         skillCol1 = false;
         skillCol2 = false;
         ASskill.SetActive(false);
-        
+        isad = false;
+        isHammer = false;
     }
     IEnumerator ResetFiring(){
         yield return new WaitForSeconds(0.3f);
@@ -468,11 +487,7 @@ public class Player : MonoBehaviour{
         yield return new WaitUntil(() => CheckEnter());
         foreach (Enemy enemy in enemies)
         {
-            if (enemy != null && isHammer&&enemy.isEnter){
-                Debug.Log(enemy);
-                StartCoroutine(MoveEnemy(enemy.transform));
-            }
-            if (enemy != null && isHammer&&enemy.isEnter){
+            if (enemy != null && enemy.isEnter){
                 Debug.Log(enemy);
                 StartCoroutine(MoveEnemy(enemy.transform));
             }
@@ -480,8 +495,49 @@ public class Player : MonoBehaviour{
         
         StartCoroutine("ResetSkillCool");
     }
+    IEnumerator Skillasd(){
+        yield return new WaitForSeconds(0.3f);
+        isSkill = false;
+        // yield return StartCoroutine(SkillCheck());
+        foreach (Enemy enemy in enemies){
+            StartCoroutine(SkillCheck(enemy));
+        }
+        yield return new WaitUntil(() => CheckEnter());
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy != null && enemy.isEnter){
+                Debug.Log("?");
+                Debug.Log(enemy);
+                Transform enemyTransform = enemy.transform;
+                Vector3 targetPosition = enemyTransform.position - enemyTransform.forward * 2; // 적의 위치에서 앞으로 2만큼 떨어진 곳으로 설정
+                GameObject playerClone = Instantiate(playerPrefab, targetPosition, Quaternion.identity);
+                Destroy(gameObject);
+                enemy.TakeDamage(100);
+                yield break;
+            }
+        }
+    }
+    bool CheckEnter(){
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy != null && enemy.isEnter)
+            {
+                
+            Debug.Log("체크");
+                return true;
+            }
+        }
+        return false;
+    }
+    IEnumerator SkillCheck(Enemy enemy){
+            Debug.Log("뭐없음");
+        while(!enemy.isEnter){
+            yield return null;
+        }
+    }
     
     IEnumerator MoveEnemy(Transform enemy){
+        Debug.Log("왜 작업안함?");
         Vector3 startPos = enemy.transform.position;
 
         Vector3 controlPoint1, controlPoint2,targetPos;
@@ -514,27 +570,23 @@ public class Player : MonoBehaviour{
         
         // 레이캐스트를 통해 이동 경로에 장애물이 있는지 확인
         RaycastHit2D hit = Physics2D.Raycast(enemy.position, Vector2.up, 1f ,floorLayer);
-        if (hit.collider != null) {
+            if (hit.collider != null) {
+                Debug.Log("Raycast hit: " + hit.collider);
+                Vector3 hitPoint = hit.point;
+                Vector3 newTargetPos = new Vector3(hitPoint.x, hitPoint.y - 1.5f, 0f); // 장애물 아래로 위치 조정
+                
+                targetPos = newTargetPos;
+                stopMove = true;
+                enemyRigid.velocity = Vector2.zero;
+                
+                //애니매이션 나오게 하고 아래에서 시간초 계산하면 되겠다
+                yield return new WaitForSeconds(1f);
+            }
+            if(!stopMove)
+                enemy.position = newPosition; // 현재 위치를 새로운 위치로 설정
             
-            Debug.Log("Raycast hit: " + hit.collider);
-            Vector3 hitPoint = hit.point;
-            Vector3 newTargetPos = new Vector3(hitPoint.x, hitPoint.y - 1.5f, 0f); // 장애물 아래로 위치 조정
-            
-            targetPos = newTargetPos;
-            stopMove = true;
-            enemyRigid.velocity = Vector2.zero;
-            
-            //애니매이션 나오게 하고 아래에서 시간초 계산하면 되겠다
-            yield return new WaitForSeconds(1f);
-            
-           
-        }else{
-        }
-        if(!stopMove)
-            enemy.position = newPosition; // 현재 위치를 새로운 위치로 설정
-        
-        yield return null;
-    }    
+            yield return null;
+        }    
         Hammer.tag = "Hammer";
         hamtag.tag = "Hammer";
         OnBow();
@@ -600,21 +652,7 @@ public class Player : MonoBehaviour{
         anim.SetBool("isJump",false);
         Hammerparticle.enableEmission = false;
     }
-    bool CheckEnter(){
-        foreach (Enemy enemy in enemies)
-        {
-            if (enemy != null && enemy.isEnter)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    IEnumerator SkillCheck(Enemy enemy){
-        while(!enemy.isEnter){
-            yield return null;
-        }
-    }
+}
     //     void CreateBullet()//적을 맞추고 날라가는스킬
     // {
     //     if(isSkill){
@@ -643,29 +681,6 @@ public class Player : MonoBehaviour{
     //     }
         
     // }
-    IEnumerator Skillasd(){
-        yield return new WaitForSeconds(0.3f);
-        isSkill = false;
-        // yield return StartCoroutine(SkillCheck());
-        foreach (Enemy enemy in enemies)
-        {
-            StartCoroutine(SkillCheck(enemy));
-        }
-        yield return new WaitUntil(() => CheckEnter());
-        foreach (Enemy enemy in enemies)
-        {
-            if (enemy != null && enemy.isEnter){
-                Debug.Log(enemy);
-                Transform enemyTransform = enemy.transform;
-                Vector3 targetPosition = enemyTransform.position - enemyTransform.forward * 2; // 적의 위치에서 앞으로 2만큼 떨어진 곳으로 설정
-                GameObject playerClone = Instantiate(playerPrefab, targetPosition, Quaternion.identity);
-                Destroy(gameObject);
-                enemy.TakeDamage(100);
-                yield break;
-            }
-        }
-    }
-}
 // IEnumerator MoveEnemy(Transform enemy){
     //     Vector3 startPos = enemy.transform.position;
     //     Vector3 targetPos = startPos + new Vector3(6f,5f,0f);
