@@ -91,30 +91,25 @@ public class Enemy : MonoBehaviour
                     case Type.Shiled:
                         curHelath -= weapon.Sworddamage;
                     break;
-            }
+                }
                 if(weapon.isHammer){
                     isEnter = true;
-                    
+                    Debug.Log("확인");
                     StartCoroutine("isEnterdel");
                 }
                 if(weapon.isSkill){
                     Destroy(weapon);
                     StartCoroutine("DestroySwd");
                 }
+                // if(weapon.isSkil4){
+                //     isEnter = true;
+                // }
                 Vector3 reactVec = transform.position - other.transform.position;
                     
                 StartCoroutine(OnDamage(reactVec));
             }
         } 
     }
-    // public void SkillDamage(string SkillEnum){
-    //     if(SkillEnum == "Skill2"){
-
-    //         Vector3 reactVec = transform.position - other.transform.position;
-    //         OnDamage(reactVec);
-    //     }
-        
-    // }
 
     IEnumerator OnDamage(Vector3 reactVec){
         foreach(SpriteRenderer mesh in sprite)
@@ -149,11 +144,10 @@ public class Enemy : MonoBehaviour
     IEnumerator DestroySwd(){
         yield return new WaitForSeconds(2.5f);
         isEnter = false;
-        // MSword.SetActive(false);
+        MSword.SetActive(false);
     }
     IEnumerator isEnterdel(){
         yield return new WaitForSeconds(2.5f);
         isEnter = false;
-        // MSword.SetActive(false);
     }
 }
