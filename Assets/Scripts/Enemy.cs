@@ -63,20 +63,16 @@ public class Enemy : MonoBehaviour
                 if(bulletd.type == bullet.Type.Skill){
                     isEnter = true;
                     curHelath -= bulletd.bulletdamgae;
-                    Debug.Log("총알닿음1?");
                     Vector3 reactVec = transform.position - other.transform.position;
 
                     StartCoroutine(OnDamage(reactVec));
                     Destroy(other.gameObject);
                     StartCoroutine("DestroySwd");
-                    Debug.Log("dddd");
-                    
                 }else if(bulletd.type == bullet.Type.Arrow){
                     curHelath -= bulletd.bulletdamgae;
                     
                     Vector3 reactVec = transform.position - other.transform.position;
                     StartCoroutine(OnDamage(reactVec));
-                    Debug.Log("총알닿음2?");
                 }
             }
         }
@@ -93,17 +89,10 @@ public class Enemy : MonoBehaviour
                     break;
                 }
                 if(weapon.isHammer){
-                    isEnter = true;
                     Debug.Log("확인");
+                    isEnter = true;
                     StartCoroutine("isEnterdel");
                 }
-                if(weapon.isSkill){
-                    Destroy(weapon);
-                    StartCoroutine("DestroySwd");
-                }
-                // if(weapon.isSkil4){
-                //     isEnter = true;
-                // }
                 Vector3 reactVec = transform.position - other.transform.position;
                     
                 StartCoroutine(OnDamage(reactVec));
@@ -130,12 +119,12 @@ public class Enemy : MonoBehaviour
             Die();
         }
     }
+    
     public void TakeDamage(int damageAmount)
     {
         curHelath -= damageAmount;
         
         StartCoroutine(OnDamage(Vector3.zero)); // OnDamage 함수를 호출하여 피해를 입힙니다.
-    
     }
     void Die()
     {

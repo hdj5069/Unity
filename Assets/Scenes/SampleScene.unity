@@ -34800,7 +34800,7 @@ Transform:
   m_GameObject: {fileID: 1119783182}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28.39, y: -0.05, z: 0}
+  m_LocalPosition: {x: 13.93, y: -0.6, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34897,7 +34897,6 @@ MonoBehaviour:
   ArrowObj: {fileID: 7737148279669808546, guid: f51571b74f2ea3a4b8f653cc32305036, type: 3}
   perenArrow: {fileID: 7737148279669808546, guid: d58c4395c1fe1c84cb4e8746e1eba539, type: 3}
   SkillObj: {fileID: 721889802133068220, guid: 2914c6703eb23d44ab41eb0c3bbceff3, type: 3}
-  SkillObj2: {fileID: 506825358989738384, guid: d6562b7770a3661478e1fc33d9da706a, type: 3}
   jumphammer: {fileID: 4990347158519348705}
   jumpSword: {fileID: 1360730967}
   HammerCollider: {fileID: 6863142852977348974}
@@ -34910,7 +34909,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   hamtag: {fileID: 6863142852977348973}
-  isSkill: 0
+  isSkil4: 0
   curveDuration: 5
   isHammer: 0
   a: 0
@@ -54481,7 +54480,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9197673042640709874, guid: 4b2bc4009393bfb4c83285e20f6cc990, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9197673042640709874, guid: 4b2bc4009393bfb4c83285e20f6cc990, type: 3}
       propertyPath: m_TagString
@@ -54563,7 +54562,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863142852977348973}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -54731,7 +54730,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7106359831607128763, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7106359831607128763, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_TagString
@@ -54743,7 +54742,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7418617215631693807, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_TagString
-      value: Skill
+      value: Hammer
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
