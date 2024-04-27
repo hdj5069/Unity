@@ -17,7 +17,6 @@ public class Enemy : MonoBehaviour
     Player player;
     void Awake(){
         sprite = GetComponentsInChildren<SpriteRenderer>();//MeshRenderer에서 material을 뽑아올 때는 소문자로 작성
-
     }
     void Update(){
         if(enemyType == Type.normal){
@@ -25,39 +24,40 @@ public class Enemy : MonoBehaviour
         }
     }
     private void OnTriggerEnter2D(Collider2D other) {
+        Debug.Log(other.tag);
         if(other.tag =="Hammer"){
             Player weapon = other.GetComponentInParent<Player>();
-        if(weapon != null){
-            switch(enemyType){
-                case Type.normal:
-                    curHelath -= weapon.Hammerdamgae;
-                break;
-                case Type.Shiled:
-                    curHelath -= weapon.Hammerdamgae + 5;
-                break;
-        }
-            Vector3 reactVec = transform.position - other.transform.position;
-            StartCoroutine(OnDamage(reactVec));
-        }
+            if(weapon != null){
+                switch(enemyType){
+                    case Type.normal:
+                        curHelath -= weapon.Hammerdamgae;
+                    break;
+                    case Type.Shiled:
+                        curHelath -= weapon.Hammerdamgae + 5;
+                    break;
+                }
+                Vector3 reactVec = transform.position - other.transform.position;
+                StartCoroutine(OnDamage(reactVec));
+            }
 
-    }
-    else if(other.tag =="Sword"){
-        Player weapon = other.GetComponentInParent<Player>();
-        if(weapon != null){
-            switch(enemyType){
-                case Type.normal:
-                    curHelath -= weapon.Sworddamage + 3;
-                break;
-                case Type.Shiled:
-                    curHelath -= weapon.Sworddamage;
-                break;
         }
-            Vector3 reactVec = transform.position - other.transform.position;
-            StartCoroutine(OnDamage(reactVec));
-        }
+        else if(other.tag =="Sword"){
+            Player weapon = other.GetComponentInParent<Player>();
+            if(weapon != null){
+                switch(enemyType){
+                    case Type.normal:
+                        curHelath -= weapon.Sworddamage + 3;
+                    break;
+                    case Type.Shiled:
+                        curHelath -= weapon.Sworddamage;
+                    break;
+            }
+                Vector3 reactVec = transform.position - other.transform.position;
+                StartCoroutine(OnDamage(reactVec));
+            }
 
-    } 
-    else if(other.tag == "Bullet"){
+        } 
+        else if(other.tag == "Bullet"){
             bullet bulletd = other.GetComponent<bullet>();
             if(bulletd != null){
                 if(bulletd.type == bullet.Type.Skill){
@@ -78,7 +78,6 @@ public class Enemy : MonoBehaviour
         }
         else if(other.tag =="Skill"){
             Player weapon = other.GetComponentInParent<Player>();
-            
             if(weapon != null){
                 switch(enemyType){
                     case Type.normal:
@@ -88,10 +87,11 @@ public class Enemy : MonoBehaviour
                         curHelath -= weapon.Sworddamage;
                     break;
                 }
-                if(weapon.isHammer){
-                    Debug.Log("확인");
+                if(weapon.HammerSkill){
                     isEnter = true;
-                    StartCoroutine("isEnterdel");
+                }
+                if(weapon.SwordSkill){
+                    isEnter = true;
                 }
                 Vector3 reactVec = transform.position - other.transform.position;
                     

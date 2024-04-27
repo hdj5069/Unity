@@ -306,7 +306,7 @@ MonoBehaviour:
   arrowOffset: 0.5
   bulletdamgae: 5
   type: 0
-  isPenetrate: 0
+  isPenetrate: 1
   instatarrow: []
   gameManager: {fileID: 0}
 --- !u!50 &7959319027695272005

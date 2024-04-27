@@ -265,7 +265,7 @@ GameObject:
   - component: {fileID: 7959319027695272005}
   - component: {fileID: 5574217064644246998}
   m_Layer: 8
-  m_Name: PerentArrow
+  m_Name: PenetrateArrow
   m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -306,7 +306,7 @@ MonoBehaviour:
   arrowOffset: 0.5
   bulletdamgae: 5
   type: 0
-  isPenetrate: 1
+  isPenetrate: 0
   instatarrow: []
   gameManager: {fileID: 0}
 --- !u!50 &7959319027695272005
