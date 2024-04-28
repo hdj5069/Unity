@@ -7,8 +7,9 @@ using UnityEngine.AI;
 public class Player : MonoBehaviour{
     public GameObject playerPrefab;
     public GameObject gameManager;
-    public float maxSpeed;
-    public float jumpPower;
+    public float SkillasCool,SkilladCool,SkillsdCool,SkillasdCool;
+    public float maxSpeed,againjump,jumpPower;
+
     public GameObject Sword;
     public GameObject Hammer;
     public GameObject Bow;
@@ -31,12 +32,12 @@ public class Player : MonoBehaviour{
     public LayerMask floorLayer;
     public GameObject hamtag;
     bool isSkill,isSkillasd;
-    bool skillCol1,skillCol2;
+    bool skillasCol,skillsdCol,skilladCol,skillasdCol;
     float holdingkey = 0f;
-    public float curveDuration = 0.1f;
+    float curveDuration = 0.1f;
     SpriteRenderer spriteRenderer;
     bool HammerCool,SwordCool,ArrowCool;
-    bool isMove,isJump,isDash,isDashCool;
+    bool isMove,isJump,isDash,isDashCool,isagainJump;
     bool isArrow,isHammer,isSword;
     public bool HammerSkill,SwordSkill;
     public int a;
@@ -56,14 +57,26 @@ public class Player : MonoBehaviour{
     }
     void Update() {
         if(!isMove){
+            
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
+                rigid.velocity = new Vector2(rigid.velocity.x,0);
                 rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            }else if(Input.GetButtonDown("Vertical") && !isagainJump){
+                float jumpagagin = againjump;
+                isagainJump = true;
+                if(rigid.velocity.y < 0){
+                rigid.velocity = new Vector2(rigid.velocity.x,0);
+                }else if(rigid.velocity.y > 0){
+                rigid.velocity = new Vector2(rigid.velocity.x,0);
+                jumpagagin = againjump +0.5f;
+                }
+                rigid.AddForce(Vector2.up * jumpagagin, ForceMode2D.Impulse);
             }
             if(Input.GetButtonUp("Horizontal")){
                 rigid.velocity = new Vector2(rigid.velocity.normalized.x * 0.5f,rigid.velocity.y);
             }
-             float moveInput = Input.GetAxisRaw("Horizontal");
+            float moveInput = Input.GetAxisRaw("Horizontal");
             if (Mathf.Abs(moveInput) > 0) { 
                 transform.localScale = new Vector3(moveInput * -5f, 5f, 1f); // 입력 방향에 따라 scale 값을 조정하여 크기 변경
             }
@@ -75,6 +88,8 @@ public class Player : MonoBehaviour{
         if(!isMove){
             float h = Input.GetAxisRaw("Horizontal");
             rigid.AddForce(Vector2.right * h, ForceMode2D.Impulse);
+        }else{
+            rigid.AddForce(Vector2.zero);
         }
         if(rigid.velocity.x > maxSpeed&&!isDash){
             rigid.velocity = new Vector2(maxSpeed,rigid.velocity.y);
@@ -83,23 +98,28 @@ public class Player : MonoBehaviour{
         }
         if(checkGrounded()){
             isJump = false;
+            isagainJump = false;
         }
     }
 
     void SkillPriority(){
-        if (Input.GetKey(KeyCode.A) &&Input.GetKey(KeyCode.S) &&Input.GetKey(KeyCode.D) && !skillCol1 && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+        if (Input.GetKey(KeyCode.A) &&Input.GetKey(KeyCode.S) &&Input.GetKey(KeyCode.D) && !skillasdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+            skillasdCol = true;
             isSkill = true;
-            Skill3();
+            SkillASD();
         }
-        else if (Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&!Input.GetKey(KeyCode.D) && !skillCol1 && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+        else if (Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&!Input.GetKey(KeyCode.D) && !skillasCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+            skillasCol = true;
             isSkill = true;
-            Skill1();
-        }else if (!Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) && !skillCol1 && !ArrowCool && !SwordCool && !HammerCool && !isSkill  ) {
-            Skill4();
+            SkillAS();
+        }else if (!Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) && !skillsdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill &&!isJump ) {
+            skillsdCol = true;
+            SkillSD();
             isSkill = true;
         }
-        else if(Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) &&!skillCol2 && !ArrowCool && !SwordCool && !HammerCool&& !isSkill &&!isJump){
-            Skill2();
+        else if(Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) &&!skilladCol && !ArrowCool && !SwordCool && !HammerCool&& !isSkill &&!isJump){
+            skilladCol = true;
+            SkillAD();
             isSkill = true;
         }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer){
             OnSword();
@@ -194,23 +214,27 @@ public class Player : MonoBehaviour{
         isDashCool = false;
     }
 
-    void Skill1(){
+    void SkillAS(){
         Debug.Log("A와 S키가 동시에 눌렀습니다.");
+        if(anim.GetBool("doSword")){
+            anim.SetBool("isCharge",false);
+            anim.SetBool("doSword",false);
+        }
+        anim.ResetTrigger("doShot");
+        anim.ResetTrigger("Atk");
         OnBow();
-        skillCol1 = true;
         StartCoroutine("Charge");
     }
-    void Skill2(){
+    void SkillAD(){
         Debug.Log("A와 D키가 동시에 눌렀습니다.");
         if(anim.GetBool("doHammer")){
             anim.SetBool("doHammer",false);
             anim.SetBool("isCharge",false);
         }
         OnHammmer();
-        skillCol2 = true;
-        StartCoroutine("ActionSkill2");
+        StartCoroutine("detailAD");
     }
-    void Skill3(){
+    void SkillASD(){
         anim.ResetTrigger("doSkill2");
         if(anim.GetBool("doHammer")){
             anim.SetBool("doHammer",false);
@@ -224,7 +248,7 @@ public class Player : MonoBehaviour{
         isSkillasd = true;
         CreateBullet();
     }
-    void Skill4(){
+    void SkillSD(){
         if(anim.GetBool("doHammer")){
             anim.SetBool("doHammer",false);
             anim.SetBool("isCharge",false);
@@ -233,10 +257,10 @@ public class Player : MonoBehaviour{
             anim.SetBool("isCharge",false);
             anim.SetBool("doSword",false);
         }
-        Debug.Log("SD");
         OnSword();
-        StartCoroutine("SkillSD");
+        StartCoroutine("detailSD");
     }
+
     void AtkSword(){
         if(isJump){
             anim.SetBool("isJump",true);
@@ -337,12 +361,12 @@ public class Player : MonoBehaviour{
         OnBow();
 
         Vector3 scale = ASskill.transform.localScale;
+        isMove = true;
         if(ArrowCool){
             scale.y = 0.7f;
             StartCoroutine("ArrowCooldown");
         }else{
             scale.y = 3f;
-            isMove = true;
             yield return new WaitForSeconds(0.7f);
         }
         ASskill.transform.localScale = scale;
@@ -351,9 +375,10 @@ public class Player : MonoBehaviour{
         isMove = false;
         ASskill.SetActive(false);
         StartCoroutine("ResetSkillCool");
+        StartCoroutine("skillASTimes");
         isSkill = false;
     }
-    IEnumerator ActionSkill2(){
+    IEnumerator detailAD(){
         HammerSkill = true;
         Hammer.tag = "Skill";
         hamtag.tag = "Skill";
@@ -377,56 +402,12 @@ public class Player : MonoBehaviour{
             hamtag.tag = "Hammer";
             HammerCollider.enabled = false;
             isSkill = false;
+            StartCoroutine("skillADTimes");
             StartCoroutine("ResetSkillCool");
             yield break;
         }
     }
-    IEnumerator ChargeSword(){
-        yield return new WaitForSeconds(0.1f);
-        Debug.Log("텔포");
-        Vector3 teleportPosition = transform.position + (transform.localScale.x > 0 ? -teleportOffset : teleportOffset);
-        transform.position = teleportPosition;
 
-        yield return StartCoroutine(DetectAndDamageEnemiesBehind());
-    }
-    IEnumerator ChargeHammer(){
-        anim.SetTrigger("Atk");
-        HammerCollider.enabled = true;
-        yield return new WaitForSeconds(0.001f);
-        
-        anim.SetBool("doHammer",false);
-        anim.SetBool("isCharge",false);
-        yield return new WaitForSeconds(0.5f);
-        HammerCollider.enabled = false;
-    }
-    IEnumerator DetectAndDamageEnemiesBehind(){
-        Vector2 playerPosition = transform.position;
-        Vector2 playerDirection = transform.right;
-        teleportOffset.x = detectionDistance;
-        Debug.DrawRay(playerPosition, playerDirection * detectionDistance, Color.red);
-
-        LayerMask enemyLayerMask = LayerMask.GetMask("Enemy");
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(playerPosition, playerDirection, detectionDistance, enemyLayerMask);
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider.CompareTag("Enemy"))
-            {
-                hit.collider.GetComponent<Enemy>().TakeDamage(100);
-
-                Debug.Log("플레이어 뒤에 적이 감지되었습니다.");
-                Debug.Log(hit.collider.name);
-            }
-        }
-        anim.SetTrigger("Atk");
-        yield return new WaitForSeconds(0.2f);
-        anim.SetBool("Sword",false);
-        anim.SetBool("isCharge",false);
-        isKeyPressed = false;
-        SwordCool = false;
-
-    }
     void CreateBullet(){
         if(isSkillasd){
             Vector3 bulletPosition = transform.position + transform.up * 1f;
@@ -469,18 +450,9 @@ public class Player : MonoBehaviour{
             }
         }
     }
-    IEnumerator ResetSkillCool(){
-        yield return new WaitForSeconds(1f);
-        HammerSkill = false;
-        isSkillasd = false;
-        isKeyPressed = false;
-        yield return new WaitForSeconds(0.2f);
-        skillCol1 = false;
-        skillCol2 = false;
-        
-    }
 
-    IEnumerator SkillSD(){
+
+    IEnumerator detailSD(){
         SwordSkill = true;
         Sword.tag = "Skill";
         yield return new WaitForSeconds(0.1f);
@@ -534,19 +506,51 @@ public class Player : MonoBehaviour{
         // }
         
         isSkill = false;
-        yield return new WaitForSeconds(3f);
+        StartCoroutine("skillSDTimes");
         
         StartCoroutine("ResetSkillCool");
     }
 
-    bool checkWallAhead() {
-        float direction = Mathf.Sign(transform.localScale.x); // 플레이어의 방향을 구함
-        Vector2 raycastStart = rigid.position + Vector2.right * 0.5f * -direction;
+    IEnumerator Skillasd(){
+        bool hasTime = false;
+        yield return new WaitForSeconds(0.3f);
+        foreach (Enemy enemy in enemies){
+            StartCoroutine(SkillCheck(enemy));
+        }
+        yield return new WaitUntil(() => CheckEnter()||skilalsdTime());
 
-        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.right * direction, 1, LayerMask.GetMask("Wall"));
-
-        return (rayHit.collider != null);
-
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy != null && enemy.isEnter){
+                hasTime = true;
+                Debug.Log("??");
+                Debug.Log(enemy);
+                Transform enemyTransform = enemy.transform;
+                Vector3 targetPosition = enemyTransform.position - enemyTransform.forward * 2; // 적의 위치에서 앞으로 2만큼 떨어진 곳으로 설정
+                GameObject playerClone = Instantiate(playerPrefab, targetPosition, Quaternion.identity);
+                Destroy(gameObject);
+                enemy.TakeDamage(100);
+                enemy.isEnter = false;
+            }
+        }
+        if(!hasTime){
+            isSkill = false;
+            StartCoroutine("skillASDTimes");
+            StartCoroutine("ResetSkillCool");
+            yield break;
+        }
+        isSkill =false;
+        StartCoroutine("skillASDTimes");
+        StartCoroutine("ResetSkillCool");
+    }
+        IEnumerator ResetSkillCool(){
+        isArrow = false;
+        isHammer = false;
+        isSword = false;
+        yield return new WaitForSeconds(1f);
+        HammerSkill = false;
+        isSkillasd = false;
+        isKeyPressed = false;
     }
     bool skillsdTime() {
         Debug.Log(Time.time - targetTime);
@@ -556,30 +560,60 @@ public class Player : MonoBehaviour{
             return false;
         }
     }
-
-    IEnumerator Skillasd(){
-        yield return new WaitForSeconds(0.3f);
-        foreach (Enemy enemy in enemies){
-            StartCoroutine(SkillCheck(enemy));
+    bool skilalsdTime() {
+        Debug.Log("asd");
+        Debug.Log(Time.time - targetTime);
+        if (Time.time - targetTime >= 5f) { 
+            return true;
+        } else {
+            return false;
         }
-        yield return new WaitUntil(() => CheckEnter());
-        foreach (Enemy enemy in enemies)
+    }
+
+    IEnumerator ChargeSword(){
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log("텔포");
+        Vector3 teleportPosition = transform.position + (transform.localScale.x > 0 ? -teleportOffset : teleportOffset);
+        transform.position = teleportPosition;
+
+        yield return StartCoroutine(DetectAndDamageEnemiesBehind());
+    }
+    IEnumerator ChargeHammer(){
+        anim.SetTrigger("Atk");
+        HammerCollider.enabled = true;
+        yield return new WaitForSeconds(0.001f);
+        
+        anim.SetBool("doHammer",false);
+        anim.SetBool("isCharge",false);
+        yield return new WaitForSeconds(0.5f);
+        HammerCollider.enabled = false;
+    }
+    IEnumerator DetectAndDamageEnemiesBehind(){
+        Vector2 playerPosition = transform.position;
+        Vector2 playerDirection = transform.right;
+        teleportOffset.x = detectionDistance;
+        Debug.DrawRay(playerPosition, playerDirection * detectionDistance, Color.red);
+
+        LayerMask enemyLayerMask = LayerMask.GetMask("Enemy");
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(playerPosition, playerDirection, detectionDistance, enemyLayerMask);
+
+        foreach (RaycastHit2D hit in hits)
         {
-            if (enemy != null && enemy.isEnter){
-                Debug.Log("??");
-                Debug.Log(enemy);
-                Transform enemyTransform = enemy.transform;
-                Vector3 targetPosition = enemyTransform.position - enemyTransform.forward * 2; // 적의 위치에서 앞으로 2만큼 떨어진 곳으로 설정
-                GameObject playerClone = Instantiate(playerPrefab, targetPosition, Quaternion.identity);
-                Destroy(gameObject);
-                enemy.TakeDamage(100);
-                enemy.isEnter = false;
-                yield break;
-            }
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                hit.collider.GetComponent<Enemy>().TakeDamage(100);
 
+                Debug.Log("플레이어 뒤에 적이 감지되었습니다.");
+                Debug.Log(hit.collider.name);
+            }
         }
-        isSkill =false;
-        StartCoroutine("ResetSkillCool");
+        anim.SetTrigger("Atk");
+        yield return new WaitForSeconds(0.2f);
+        anim.SetBool("Sword",false);
+        anim.SetBool("isCharge",false);
+        isKeyPressed = false;
+        SwordCool = false;
     }
     IEnumerator MoveEnemy(Transform enemy){
         Vector3 startPos = enemy.transform.position;
@@ -665,6 +699,15 @@ public class Player : MonoBehaviour{
         p += ttt * p3;
         return p;
     }
+    bool checkWallAhead() {
+        float direction = Mathf.Sign(transform.localScale.x); // 플레이어의 방향을 구함
+        Vector2 raycastStart = rigid.position + Vector2.right * 0.5f * -direction;
+
+        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.right * direction, 1, LayerMask.GetMask("Wall"));
+
+        return (rayHit.collider != null);
+
+    }
     bool checkGrounded() {
         Debug.DrawRay(rigid.position, Vector2.down, new Color(0, 1, 0));
         Vector2 raycastStart = rigid.position - Vector2.up * 1f;
@@ -697,6 +740,19 @@ public class Player : MonoBehaviour{
         yield return new WaitForSeconds(0.3f);
         anim.SetBool("isJump",false);
         Hammerparticle.enableEmission = false;
+    }
+    IEnumerator skillASTimes(){
+        yield return new WaitForSeconds(SkillasCool);
+        skillasCol = false;
+    }IEnumerator skillADTimes(){
+        yield return new WaitForSeconds(SkilladCool);
+        skilladCol = false;
+    }IEnumerator skillSDTimes(){
+        yield return new WaitForSeconds(SkillsdCool);
+        skillsdCol = false;
+    }IEnumerator skillASDTimes(){
+        yield return new WaitForSeconds(SkillasdCool);
+        skillasdCol = false;
     }
     bool CheckEnter(){
         foreach (Enemy enemy in enemies)

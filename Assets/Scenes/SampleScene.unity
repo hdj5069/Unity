@@ -35231,8 +35231,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 1119783182}
   gameManager: {fileID: 1861340310}
+  SkillasCool: 10
+  SkilladCool: 10
+  SkillsdCool: 10
+  SkillasdCool: 10
   maxSpeed: 6
-  jumpPower: 6
+  againjump: 5.5
+  jumpPower: 7
   Sword: {fileID: 1360730963}
   Hammer: {fileID: 4990347158519348704}
   Bow: {fileID: 1945438505}
@@ -35256,7 +35261,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   hamtag: {fileID: 6863142852977348973}
-  curveDuration: 5
   HammerSkill: 0
   SwordSkill: 0
   a: 0

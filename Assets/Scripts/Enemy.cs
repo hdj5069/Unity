@@ -24,7 +24,6 @@ public class Enemy : MonoBehaviour
         }
     }
     private void OnTriggerEnter2D(Collider2D other) {
-        Debug.Log(other.tag);
         if(other.tag =="Hammer"){
             Player weapon = other.GetComponentInParent<Player>();
             if(weapon != null){
@@ -67,7 +66,6 @@ public class Enemy : MonoBehaviour
 
                     StartCoroutine(OnDamage(reactVec));
                     Destroy(other.gameObject);
-                    StartCoroutine("DestroySwd");
                 }else if(bulletd.type == bullet.Type.Arrow){
                     curHelath -= bulletd.bulletdamgae;
                     
@@ -113,7 +111,7 @@ public class Enemy : MonoBehaviour
         }
         else{
             foreach(SpriteRenderer mesh in sprite)
-                mesh.color = Color.gray;
+            mesh.color = Color.gray;
             gameObject.layer = 12;
             isDead = true;
             Die();
@@ -130,13 +128,5 @@ public class Enemy : MonoBehaviour
     {
         Destroy(gameObject);
     }
-    IEnumerator DestroySwd(){
-        yield return new WaitForSeconds(2.5f);
-        isEnter = false;
-        MSword.SetActive(false);
-    }
-    IEnumerator isEnterdel(){
-        yield return new WaitForSeconds(2.5f);
-        isEnter = false;
-    }
+    
 }
