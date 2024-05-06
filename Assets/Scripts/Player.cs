@@ -9,7 +9,6 @@ public class Player : MonoBehaviour{
     public GameObject gameManager;
     public float SkillasCool,SkilladCool,SkillsdCool,SkillasdCool;
     public float maxSpeed,againjump,jumpPower;
-
     public GameObject Sword;
     public GameObject Hammer;
     public GameObject Bow;
@@ -57,7 +56,6 @@ public class Player : MonoBehaviour{
     }
     void Update() {
         if(!isMove){
-            
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
@@ -69,7 +67,7 @@ public class Player : MonoBehaviour{
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 }else if(rigid.velocity.y > 0){
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
-                jumpagagin = againjump +0.5f;
+                jumpagagin = againjump + 0.5f;
                 }
                 rigid.AddForce(Vector2.up * jumpagagin, ForceMode2D.Impulse);
             }
@@ -186,7 +184,6 @@ public class Player : MonoBehaviour{
                 ChargeAttack("Arrow");
             }
             else{
-            Debug.Log("?!");
                 AtkArrow();
             }
             
@@ -569,15 +566,6 @@ public class Player : MonoBehaviour{
             return false;
         }
     }
-
-    IEnumerator ChargeSword(){
-        yield return new WaitForSeconds(0.1f);
-        Debug.Log("텔포");
-        Vector3 teleportPosition = transform.position + (transform.localScale.x > 0 ? -teleportOffset : teleportOffset);
-        transform.position = teleportPosition;
-
-        yield return StartCoroutine(DetectAndDamageEnemiesBehind());
-    }
     IEnumerator ChargeHammer(){
         anim.SetTrigger("Atk");
         HammerCollider.enabled = true;
@@ -588,26 +576,61 @@ public class Player : MonoBehaviour{
         yield return new WaitForSeconds(0.5f);
         HammerCollider.enabled = false;
     }
-    IEnumerator DetectAndDamageEnemiesBehind(){
-        Vector2 playerPosition = transform.position;
-        Vector2 playerDirection = transform.right;
-        teleportOffset.x = detectionDistance;
-        Debug.DrawRay(playerPosition, playerDirection * detectionDistance, Color.red);
 
-        LayerMask enemyLayerMask = LayerMask.GetMask("Enemy");
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(playerPosition, playerDirection, detectionDistance, enemyLayerMask);
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider.CompareTag("Enemy"))
-            {
+    IEnumerator ChargeSword(){
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log("텔포");
+        
+        LayerMask wallLayerMask = LayerMask.GetMask("Wall");
+        LayerMask FloorLayer = LayerMask.GetMask("Floor");
+        LayerMask BossLayerMask = LayerMask.GetMask("Boss");
+        Vector3 teleportDirection = Vector3.zero;
+        if(Input.GetKey(KeyCode.LeftArrow)){
+            teleportDirection += Vector3.left;
+        }
+        if(Input.GetKey(KeyCode.RightArrow)){
+            teleportDirection += Vector3.right;
+        }
+        if(Input.GetKey(KeyCode.UpArrow)){
+            teleportDirection += Vector3.up;
+        }
+        if(Input.GetKey(KeyCode.DownArrow)){
+            teleportDirection += Vector3.down;
+        }
+        Vector3 playerPos = transform.position;
+        Vector3 teleportPosition = playerPos + (teleportDirection.normalized * teleportOffset.magnitude);
+        Debug.DrawRay(playerPos, teleportPosition - playerPos, Color.blue,3f);
+        RaycastHit2D hit = Physics2D.Raycast(playerPos, teleportPosition - playerPos, Vector3.Distance(teleportPosition, playerPos), wallLayerMask|BossLayerMask|FloorLayer);
+        if (hit.collider != null){
+            // 벽이 있으면 텔포 위치를 벽의 바로 앞으로 이동
+            if(!hit.collider.CompareTag("Floor")){
+            teleportPosition = hit.point - (hit.normal * 0.1f);
+            //hit.point로 ray로 벽이 있는지 확인하여 확인된 곳에 위치를 point로 저장 
+            //hit.normal * 0.1f로 충돌지점에서 플레이어를 밀어냄
+            }
+            else{
+                teleportPosition = hit.point + (hit.normal * 0.5f);
+            }
+            if(hit.collider.CompareTag("Boss")){
+                    
                 hit.collider.GetComponent<Enemy>().TakeDamage(100);
-
-                Debug.Log("플레이어 뒤에 적이 감지되었습니다.");
-                Debug.Log(hit.collider.name);
             }
         }
+        LayerMask enemyLayerMask = LayerMask.GetMask("Enemy");
+        RaycastHit2D[] hits = Physics2D.RaycastAll(playerPos, teleportPosition - playerPos, Vector3.Distance(teleportPosition, playerPos), enemyLayerMask);
+
+        foreach (RaycastHit2D hited in hits)
+        {
+            if (hited.collider.CompareTag("Enemy"))
+            {
+                hited.collider.GetComponent<Enemy>().TakeDamage(100);
+
+                Debug.Log("플레이어 뒤에 적이 감지되었습니다.");
+                Debug.Log(hited.collider.name);
+            }
+        }
+        
+        transform.position = teleportPosition;
         anim.SetTrigger("Atk");
         yield return new WaitForSeconds(0.2f);
         anim.SetBool("Sword",false);
@@ -615,6 +638,7 @@ public class Player : MonoBehaviour{
         isKeyPressed = false;
         SwordCool = false;
     }
+    
     IEnumerator MoveEnemy(Transform enemy){
         Vector3 startPos = enemy.transform.position;
 
