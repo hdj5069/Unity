@@ -34,13 +34,15 @@ public class bullet : MonoBehaviour{
         if(collision.gameObject.tag == "Floor"){
             Destroy(gameObject);
         }
-        if(collision.CompareTag("Enemy")){
+        if(collision.CompareTag("Enemy")||collision.CompareTag("Boss")){
             if(type == Type.Arrow){
 
                 Vector3 collisionPoint = collision.ClosestPoint(transform.position);
                 Vector3 arrowPosition = collisionPoint;
-
+                
+                    Debug.Log("!?!!");
                 if(isPenetrate){
+                    Debug.Log("?????");
                     GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
                     if(playerX > 0){
                         newArrow.transform.localScale = new Vector3(-1,1,1);

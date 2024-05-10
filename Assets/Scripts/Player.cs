@@ -15,6 +15,7 @@ public class Player : MonoBehaviour{
     public int Hammerdamgae;
     public int Sworddamage;
     public int bulletdamgae;
+    [Header("건들지마")]
     [SerializeField]private GameObject Sword;
     [SerializeField]private GameObject Hammer;
     [SerializeField]private GameObject playerPrefab;
@@ -34,7 +35,7 @@ public class Player : MonoBehaviour{
     private Vector3 teleportOffset = new Vector3(5f, 0f, 0f); 
     private float detectionDistance = 5f; 
     private LayerMask floorLayer;
-    private GameObject hamtag;
+    [SerializeField]private GameObject hamtag;
     bool isSkill,isSkillasd;
     bool skillasCol,skillsdCol,skilladCol,skillasdCol;
     float holdingkey = 0f;
@@ -60,10 +61,10 @@ public class Player : MonoBehaviour{
         anim = GetComponent<Animator>();
     }
     void Update() {
+        
         if(!isMove){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
-                // anim.SetTrigger("isJump0");
                 anim.SetBool("isJump",true);
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
@@ -96,7 +97,6 @@ public class Player : MonoBehaviour{
             }
             
         }else{
-            Debug.Log("??");
             anim.SetBool("isRun",false);
         }
         SkillPriority();
@@ -115,7 +115,7 @@ public class Player : MonoBehaviour{
             isagainJump = false;
         }
     }
-
+    bool prac;
     void SkillPriority(){
         if (Input.GetKey(KeyCode.A) &&Input.GetKey(KeyCode.S) &&Input.GetKey(KeyCode.D) && !skillasdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
             skillasdCol = true;
@@ -135,13 +135,13 @@ public class Player : MonoBehaviour{
             skilladCol = true;
             SkillAD();
             isSkill = true;
-        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer){
+        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer&&!isSword){
             OnSword();
             isSword = true;
             isKeyPressed = true;
             holdingkey = Time.time;
-            anim.SetBool("doSword",true);
             anim.SetBool("isCharge",true);
+            anim.SetBool("doSword",true);
         }else if(Input.GetButtonUp("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool && isSword){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
@@ -230,6 +230,7 @@ public class Player : MonoBehaviour{
     void SkillAS(){
         Debug.Log("A와 S키가 동시에 눌렀습니다.");
         if(anim.GetBool("doSword")){
+            Debug.Log("?");
             anim.SetBool("isCharge",false);
             anim.SetBool("doSword",false);
         }
@@ -240,6 +241,7 @@ public class Player : MonoBehaviour{
     }
     void SkillAD(){
         Debug.Log("A와 D키가 동시에 눌렀습니다.");
+        anim.ResetTrigger("doShot");
         if(anim.GetBool("doHammer")){
             anim.SetBool("doHammer",false);
             anim.SetBool("isCharge",false);
@@ -248,18 +250,23 @@ public class Player : MonoBehaviour{
         StartCoroutine("detailAD");
     }
     void SkillASD(){
-        anim.ResetTrigger("doSkill2");
-        if(anim.GetBool("doHammer")){
-            anim.SetBool("doHammer",false);
-            anim.SetBool("isCharge",false);
+        if(skillasdCol){
+            anim.ResetTrigger("doSkill2");
+            if(anim.GetBool("doHammer")){
+                anim.SetBool("doHammer",false);
+                anim.SetBool("isCharge",false);
+            }
+            if(anim.GetBool("doSword")){
+                anim.SetBool("isCharge",false);
+                anim.SetBool("doSword",false);
+            }
+            
+            anim.ResetTrigger("doShot");
+            Debug.Log("ASD");
+            isSkillasd = true;
+            CreateBullet();
         }
-        if(anim.GetBool("doSword")){
-            anim.SetBool("isCharge",false);
-            anim.SetBool("doSword",false);
-        }
-        Debug.Log("ASD");
-        isSkillasd = true;
-        CreateBullet();
+        
     }
     void SkillSD(){
         if(anim.GetBool("doHammer")){
@@ -280,7 +287,9 @@ public class Player : MonoBehaviour{
             jumpSword.enabled = true;
         }
         if(!isJump){
-            anim.SetTrigger("doSWD");
+            anim.SetBool("Sword",true);
+            Debug.Log("??");
+            Debug.LogWarning("?");
             SwordCollider.enabled =true;
         }
     }
@@ -524,18 +533,21 @@ public class Player : MonoBehaviour{
     }
 
     IEnumerator Skillasd(){
+        if(!prac){
+            Debug.Log("왜 작동해");
+isSkillasd = false; 
         bool hasTime = false;
         yield return new WaitForSeconds(0.3f);
-        foreach (Enemy enemy in enemies){
-            StartCoroutine(SkillCheck(enemy));
-        }
+        // foreach (Enemy enemy in enemies){
+        //     StartCoroutine(SkillCheck(enemy));
+        // }
         yield return new WaitUntil(() => CheckEnter()||skilalsdTime());
 
         foreach (Enemy enemy in enemies)
         {
             if (enemy != null && enemy.isEnter){
+                Debug.Log("0.1");
                 hasTime = true;
-                Debug.Log("??");
                 Debug.Log(enemy);
                 Transform enemyTransform = enemy.transform;
                 Vector3 targetPosition = enemyTransform.position - enemyTransform.forward * 2; // 적의 위치에서 앞으로 2만큼 떨어진 곳으로 설정
@@ -546,22 +558,25 @@ public class Player : MonoBehaviour{
             }
         }
         if(!hasTime){
-            isSkill = false;
-            StartCoroutine("skillASDTimes");
-            StartCoroutine("ResetSkillCool");
-            yield break;
-        }
-        isSkill =false;
+        Debug.Log("1");
         StartCoroutine("skillASDTimes");
         StartCoroutine("ResetSkillCool");
+        yield break;
+        }
+        Debug.Log("2");
+        
+        StartCoroutine("skillASDTimes");
+        StartCoroutine("ResetSkillCool");
+        }
     }
+        
         IEnumerator ResetSkillCool(){
         isArrow = false;
         isHammer = false;
         isSword = false;
         yield return new WaitForSeconds(1f);
+        isSkill = false;
         HammerSkill = false;
-        isSkillasd = false;
         isKeyPressed = false;
     }
     bool skillsdTime() {
@@ -788,7 +803,11 @@ public class Player : MonoBehaviour{
         yield return new WaitForSeconds(SkillsdCool);
         skillsdCol = false;
     }IEnumerator skillASDTimes(){
-        yield return new WaitForSeconds(SkillasdCool);
+        Debug.Log(SkillasdCool);
+        prac = true;
+        yield return new WaitForSeconds(10f);
+        // yield return new WaitForSeconds(SkillasdCool);
+        Debug.Log(skillasdCol);
         skillasdCol = false;
     }
     bool CheckEnter(){

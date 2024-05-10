@@ -35715,8 +35715,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 800f43c4734021d4dbd5d48d9947f32a, type: 3}
-  m_Color: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 1}
+  m_Sprite: {fileID: 152666595, guid: a05b428755b5aec4cbe4302b46946ae9, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -35816,8 +35816,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a7331f678c64814aaecf60f3bf15bef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1119783182}
-  gameManager: {fileID: 1861340310}
   SkillasCool: 10
   SkilladCool: 10
   SkillsdCool: 10
@@ -35825,13 +35823,15 @@ MonoBehaviour:
   maxSpeed: 6
   againjump: 5.5
   jumpPower: 7
-  Sword: {fileID: 1360730963}
-  Hammer: {fileID: 4990347158519348704}
-  Bow: {fileID: 1945438505}
-  ASskill: {fileID: 1013737415}
   Hammerdamgae: 10
   Sworddamage: 5
   bulletdamgae: 3
+  Sword: {fileID: 1360730963}
+  Hammer: {fileID: 4990347158519348704}
+  playerPrefab: {fileID: 1119783182}
+  gameManager: {fileID: 1861340310}
+  Bow: {fileID: 1945438505}
+  ASskill: {fileID: 1013737415}
   EnemyArrow: {fileID: 7737148279669808546, guid: 54b369529580fd34c9b8595c8f44b376, type: 3}
   ArrowObj: {fileID: 7737148279669808546, guid: d58c4395c1fe1c84cb4e8746e1eba539, type: 3}
   perenArrow: {fileID: 7737148279669808546, guid: f51571b74f2ea3a4b8f653cc32305036, type: 3}
@@ -35842,11 +35842,6 @@ MonoBehaviour:
   SwordCollider: {fileID: 1360730967}
   Hammerparticle: {fileID: 1130313440}
   enemies: []
-  teleportOffset: {x: 5, y: 0, z: 0}
-  detectionDistance: 5
-  floorLayer:
-    serializedVersion: 2
-    m_Bits: 64
   hamtag: {fileID: 6863142852977348973}
   HammerSkill: 0
   SwordSkill: 0
@@ -56213,7 +56208,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9197673042640709874, guid: 4b2bc4009393bfb4c83285e20f6cc990, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9197673042640709874, guid: 4b2bc4009393bfb4c83285e20f6cc990, type: 3}
       propertyPath: m_TagString
@@ -56463,7 +56458,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7106359831607128763, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7106359831607128763, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_TagString
@@ -56475,7 +56470,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7418617215631693807, guid: 8c612b322fbe0be4fbe8715d765df9d1, type: 3}
       propertyPath: m_TagString
-      value: Hammer
+      value: Skill
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
