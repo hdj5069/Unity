@@ -5,31 +5,36 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class Player : MonoBehaviour{
-    public GameObject playerPrefab;
-    public GameObject gameManager;
-    public float SkillasCool,SkilladCool,SkillsdCool,SkillasdCool;
-    public float maxSpeed,againjump,jumpPower;
-    public GameObject Sword;
-    public GameObject Hammer;
-    public GameObject Bow;
-    public GameObject ASskill;
+    
+    [Header("쿨타임")]
+    [SerializeField]private float SkillasCool,SkilladCool,SkillsdCool,SkillasdCool;
+    
+    [Header("최고속도,두번쨰 점프, 점프높이")]
+    [SerializeField]private float maxSpeed,againjump,jumpPower;
+    [Header("데미지")]
     public int Hammerdamgae;
     public int Sworddamage;
     public int bulletdamgae;
-    public GameObject EnemyArrow;
-    public GameObject ArrowObj;
-    public GameObject perenArrow;
-    public GameObject SkillObj;
-    public BoxCollider2D jumphammer;
-    public BoxCollider2D jumpSword;
-    public BoxCollider2D HammerCollider;
-    public BoxCollider2D SwordCollider;
-    public ParticleSystem Hammerparticle; 
+    [SerializeField]private GameObject Sword;
+    [SerializeField]private GameObject Hammer;
+    [SerializeField]private GameObject playerPrefab;
+    [SerializeField]private GameObject gameManager;
+    [SerializeField]private GameObject Bow;
+    [SerializeField]private GameObject ASskill;
+    [SerializeField]private GameObject EnemyArrow;
+    [SerializeField]private GameObject ArrowObj;
+    [SerializeField]private GameObject perenArrow;
+    [SerializeField]private GameObject SkillObj;
+    [SerializeField]private BoxCollider2D jumphammer;
+    [SerializeField]private BoxCollider2D jumpSword;
+    [SerializeField]private BoxCollider2D HammerCollider;
+    [SerializeField]private BoxCollider2D SwordCollider;
+    [SerializeField]private ParticleSystem Hammerparticle; 
     public List<Enemy> enemies = new List<Enemy>();
-    public Vector3 teleportOffset = new Vector3(5f, 0f, 0f); 
-    public float detectionDistance = 5f; 
-    public LayerMask floorLayer;
-    public GameObject hamtag;
+    private Vector3 teleportOffset = new Vector3(5f, 0f, 0f); 
+    private float detectionDistance = 5f; 
+    private LayerMask floorLayer;
+    private GameObject hamtag;
     bool isSkill,isSkillasd;
     bool skillasCol,skillsdCol,skilladCol,skillasdCol;
     float holdingkey = 0f;
@@ -58,6 +63,8 @@ public class Player : MonoBehaviour{
         if(!isMove){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
+                // anim.SetTrigger("isJump0");
+                anim.SetBool("isJump",true);
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             }else if(Input.GetButtonDown("Vertical") && !isagainJump){
@@ -79,21 +86,30 @@ public class Player : MonoBehaviour{
                 transform.localScale = new Vector3(moveInput * -5f, 5f, 1f); // 입력 방향에 따라 scale 값을 조정하여 크기 변경
             }
         }
+        if(Input.GetButton("Horizontal")){
+            if(!isMove){
+                float h = Input.GetAxisRaw("Horizontal");
+                rigid.AddForce(Vector2.right * h, ForceMode2D.Impulse);
+                anim.SetBool("isRun",true);
+            }else{
+                rigid.AddForce(Vector2.zero);
+            }
+            
+        }else{
+            Debug.Log("??");
+            anim.SetBool("isRun",false);
+        }
         SkillPriority();
     }
 
     void FixedUpdate() {
-        if(!isMove){
-            float h = Input.GetAxisRaw("Horizontal");
-            rigid.AddForce(Vector2.right * h, ForceMode2D.Impulse);
-        }else{
-            rigid.AddForce(Vector2.zero);
-        }
-        if(rigid.velocity.x > maxSpeed&&!isDash){
-            rigid.velocity = new Vector2(maxSpeed,rigid.velocity.y);
-        }else if(rigid.velocity.x < maxSpeed * (-1)&&!isDash){ //left maxspeed계산을 위해 maxSpeed가 음수로 받게함
-            rigid.velocity = new Vector2(maxSpeed*(-1),rigid.velocity.y);
-        }
+        
+            if(rigid.velocity.x > maxSpeed&&!isDash){
+                rigid.velocity = new Vector2(maxSpeed,rigid.velocity.y);
+            }else if(rigid.velocity.x < maxSpeed * (-1)&&!isDash){ //left maxspeed계산을 위해 maxSpeed가 음수로 받게함
+                rigid.velocity = new Vector2(maxSpeed*(-1),rigid.velocity.y);
+            }
+        
         if(checkGrounded()){
             isJump = false;
             isagainJump = false;
@@ -260,7 +276,6 @@ public class Player : MonoBehaviour{
 
     void AtkSword(){
         if(isJump){
-            anim.SetBool("isJump",true);
             anim.SetBool("Sword",true);
             jumpSword.enabled = true;
         }
@@ -272,7 +287,7 @@ public class Player : MonoBehaviour{
     
     void AtkHammer(){
         if(isJump){
-            anim.SetBool("isJump",true);
+            // anim.SetBool("isJump",true);
             anim.SetBool("Hammer",true);
         }
         if(!isJump){
@@ -738,6 +753,7 @@ public class Player : MonoBehaviour{
         RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.down, 1, LayerMask.GetMask("Floor")|LayerMask.GetMask("Enemy"));
         if(rigid.velocity.y < 0){
             if (rayHit.collider != null && rayHit.distance < 0.3f) {
+                anim.SetBool("isJump",false);
                 return true;
             } else {
                 return false;
@@ -752,8 +768,6 @@ public class Player : MonoBehaviour{
         yield return new WaitForSeconds(0.1f);
         Debug.Log("지면 도착");
         if(jumphammer.enabled == true){
-            // var emission = Hammerparticle.enableEmission;
-            // emission.enabled = true;
             Hammerparticle.enableEmission = true;
         }
         anim.SetBool("Sword",false);
@@ -762,7 +776,6 @@ public class Player : MonoBehaviour{
         
         SwordCollider.enabled =false;
         yield return new WaitForSeconds(0.3f);
-        anim.SetBool("isJump",false);
         Hammerparticle.enableEmission = false;
     }
     IEnumerator skillASTimes(){
