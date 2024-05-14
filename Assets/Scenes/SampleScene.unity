@@ -30755,7 +30755,7 @@ Transform:
   m_GameObject: {fileID: 1094845084}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35769,14 +35769,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119783182}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.28, y: 3.38, z: 0}
+  m_LocalRotation: {x: -0, y: -0.0056311507, z: 0, w: 0.99998415}
+  m_LocalPosition: {x: -3.22, y: 0.07, z: -0.29}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1892627117}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -0.645, z: 0}
 --- !u!70 &1119783186
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -35852,8 +35852,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SkillasCool: 10
-  SkilladCool: 10
-  SkillsdCool: 10
+  SkilladCool: 2
+  SkillsdCool: 2
   SkillasdCool: 10
   maxSpeed: 6
   againjump: 5.5
@@ -40731,7 +40731,7 @@ Transform:
   m_GameObject: {fileID: 1130313439}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: -2.1, y: -0.88193244, z: 1.0810939}
+  m_LocalPosition: {x: 6.52, y: -3.54, z: 0.98}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -41587,7 +41587,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1272245260}
   MSword: {fileID: 1151128113}
-  enemycollider: {fileID: 0}
 --- !u!61 &1272245262
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -48786,7 +48785,7 @@ Transform:
   m_GameObject: {fileID: 1484687243}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.85, y: -0.69, z: 0.0009331838}
+  m_LocalPosition: {x: -6.34, y: -0.01, z: 0.0009331838}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48842,7 +48841,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1484687245}
   MSword: {fileID: 177800676}
-  enemycollider: {fileID: 0}
 --- !u!61 &1484687247
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -49517,7 +49515,7 @@ Transform:
   m_GameObject: {fileID: 1521655473}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 20.9, y: 2.58, z: 1.0009332}
+  m_LocalPosition: {x: 12.87, y: 0, z: 1.0009332}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -49564,7 +49562,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7be737d9721de4147be6b2014a218642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 0
+  enemyType: 2
   maxHealth: 500
   curHelath: 500
   sprite: []
@@ -49573,7 +49571,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1521655475}
   MSword: {fileID: 413283624}
-  enemycollider: {fileID: 0}
 --- !u!61 &1521655477
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -49830,7 +49827,7 @@ Transform:
   m_GameObject: {fileID: 1560405642}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.04, y: 0.28, z: 0.0009331838}
+  m_LocalPosition: {x: -9.09, y: 0.6, z: 0.0009331838}
   m_LocalScale: {x: 3, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -49886,7 +49883,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1560405644}
   MSword: {fileID: 1303923735}
-  enemycollider: {fileID: 0}
 --- !u!61 &1560405646
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -50691,7 +50687,7 @@ Transform:
   m_GameObject: {fileID: 1622154941}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.7, y: -0.56, z: 0.0009331838}
+  m_LocalPosition: {x: -4.1000013, y: 0.03999996, z: 0.0009331838}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -50747,7 +50743,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1622154943}
   MSword: {fileID: 775510749}
-  enemycollider: {fileID: 0}
 --- !u!61 &1622154945
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53321,7 +53316,6 @@ MonoBehaviour:
   isEnter: 0
   rigid: {fileID: 1873418915}
   MSword: {fileID: 671791182}
-  enemycollider: {fileID: 0}
 --- !u!61 &1873418917
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -53428,7 +53422,7 @@ Transform:
   m_GameObject: {fileID: 1873418912}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.36, y: -1.03, z: 0.0009331838}
+  m_LocalPosition: {x: 0.31, y: -1.03, z: 0.0009331838}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

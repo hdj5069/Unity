@@ -40,9 +40,7 @@ public class bullet : MonoBehaviour{
                 Vector3 collisionPoint = collision.ClosestPoint(transform.position);
                 Vector3 arrowPosition = collisionPoint;
                 
-                    Debug.Log("!?!!");
                 if(isPenetrate){
-                    Debug.Log("?????");
                     GameObject newArrow = Instantiate(arrowPrefab,arrowPosition,Quaternion.identity);
                     if(playerX > 0){
                         newArrow.transform.localScale = new Vector3(-1,1,1);

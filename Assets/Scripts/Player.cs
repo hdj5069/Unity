@@ -52,7 +52,6 @@ public class Player : MonoBehaviour{
     Rigidbody2D rigid;
     Animator anim;
     bool enemyCheck;
-    
     bool isKeyPressed = false;
     void Awake() {
         Enemy[] allEnemies = FindObjectsOfType<Enemy>();
@@ -251,8 +250,11 @@ public class Player : MonoBehaviour{
             anim.SetBool("doHammer",false);
             anim.SetBool("isCharge",false);
         }
+        
         OnHammmer();
-    }
+        
+        detailAD();
+        }
     void SkillASD(){
         if(skillasdCol){
             anim.ResetTrigger("doSkill2");
@@ -272,6 +274,7 @@ public class Player : MonoBehaviour{
         }
         
     }
+    
     void SkillSD(){
         if(anim.GetBool("doHammer")){
             anim.SetBool("doHammer",false);
@@ -311,10 +314,8 @@ public class Player : MonoBehaviour{
         }
     }
     IEnumerator Delay(){
-            Debug.Log("0.1");
         yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.4f);
             rigid.velocity = Vector2.zero;
-            Debug.Log("0.2");
         yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.6f);
         
         if(anim.GetCurrentAnimatorStateInfo(0).IsName("SwingHam")){
@@ -441,9 +442,6 @@ public class Player : MonoBehaviour{
         // bool hasTime = false;;
         yield return new WaitForSeconds(0.1f);
         targetTime = Time.time;
-        Debug.Log(HammerCollider.enabled);
-        Debug.Log(Hammer.tag);
-        Debug.Log(hamtag.tag);
         anim.SetTrigger("Atk");
         yield return new WaitUntil(() => CheckEnter()||chargeHamTime());
         yield return new WaitForSeconds(0.1f);
@@ -530,7 +528,7 @@ public class Player : MonoBehaviour{
             foreach (Enemy enemy in enemies){
                 StartCoroutine(SkillCheck(enemy));
             }
-            yield return new WaitUntil(() => CheckEnter()||checkWallAhead()||skillsdTime());
+            yield return new WaitUntil(() => CheckEnter()||checkWallAhead()||skillsdTime()||checkbossAhead());
 
             foreach (Enemy enemy in enemies){
                 if (enemy != null && enemy.isEnter){
@@ -568,6 +566,35 @@ public class Player : MonoBehaviour{
         StartCoroutine("ResetSkillCool");
     }
 
+    void detailAD(){
+        for(int i = 0; i< 8;i++){
+            if(transform.localScale.x < 0){
+                Vector3 bulletPosition = transform.position + transform.forward * -100f + new Vector3(0,0,100f);
+                GameObject bullet = Instantiate(ArrowObj,bulletPosition,Quaternion.identity);
+                Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
+                float randomAngle = Random.Range(-10f,45f);
+                Quaternion randomRotation = Quaternion.Euler(0f,0f,randomAngle);
+                bullet.transform.rotation = randomRotation;
+                Vector2 forceDirection = randomRotation * Vector2.right;
+                bulletRigidbody.AddForce(forceDirection * 20, ForceMode2D.Impulse);
+            }
+            else{
+                Vector3 bulletPosition = transform.position + transform.forward * 100f + new Vector3(0,0,100f);
+                GameObject bullet = Instantiate(ArrowObj,bulletPosition,Quaternion.identity);
+                Rigidbody2D bulletRigidbody = bullet.GetComponent<Rigidbody2D>();
+                float randomAngle = Random.Range(-45f,10f);
+                Quaternion randomRotation = Quaternion.Euler(0f,0f,randomAngle);
+                bullet.transform.rotation = randomRotation;
+                Vector2 forceDirection = randomRotation * Vector2.left;
+                bulletRigidbody.AddForce(forceDirection * 20, ForceMode2D.Impulse);
+                bullet.transform.localScale = new Vector3(-1, 1, 1);
+            }
+            StartCoroutine("skillADTimes");
+            StartCoroutine("ResetSkillCool");
+        }
+        
+    }
+
     IEnumerator Skillasd(){
         if(!prac){
             Debug.Log("왜 작동해");
@@ -583,7 +610,6 @@ public class Player : MonoBehaviour{
         foreach (Enemy enemy in enemies)
         {
             if (enemy != null && enemy.isEnter){
-                Debug.Log("0.1");
                 hasTime = true;
                 Debug.Log(enemy);
                 Transform enemyTransform = enemy.transform;
@@ -595,12 +621,10 @@ public class Player : MonoBehaviour{
             }
         }
         if(!hasTime){
-        Debug.Log("1");
         StartCoroutine("skillASDTimes");
         StartCoroutine("ResetSkillCool");
         yield break;
         }
-        Debug.Log("2");
         
         StartCoroutine("skillASDTimes");
         StartCoroutine("ResetSkillCool");
@@ -625,7 +649,6 @@ public class Player : MonoBehaviour{
         }
     }
     bool skilalsdTime() {
-        Debug.Log("asd");
         Debug.Log(Time.time - targetTime);
         if (Time.time - targetTime >= 2f) { 
             return true;
@@ -661,14 +684,20 @@ public class Player : MonoBehaviour{
         if(Input.GetKey(KeyCode.LeftArrow)){
             teleportDirection += Vector3.left;
         }
-        if(Input.GetKey(KeyCode.RightArrow)){
+        else if(Input.GetKey(KeyCode.RightArrow)){
             teleportDirection += Vector3.right;
         }
-        if(Input.GetKey(KeyCode.UpArrow)){
+        else if(Input.GetKey(KeyCode.UpArrow)){
             teleportDirection += Vector3.up;
         }
-        if(Input.GetKey(KeyCode.DownArrow)){
+        else if(Input.GetKey(KeyCode.DownArrow)){
             teleportDirection += Vector3.down;
+        }
+        else if (transform.localScale.x > 0) {
+            teleportDirection += Vector3.left;
+        }
+        else if (transform.localScale.x < 0) {
+            teleportDirection += Vector3.right;
         }
         Vector3 playerPos = transform.position;
         Vector3 teleportPosition = playerPos + (teleportDirection.normalized * teleportOffset.magnitude);
@@ -798,7 +827,16 @@ public class Player : MonoBehaviour{
         float direction = Mathf.Sign(transform.localScale.x); // 플레이어의 방향을 구함
         Vector2 raycastStart = rigid.position + Vector2.right * 0.5f * -direction;
 
-        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.right * direction, 1, LayerMask.GetMask("Wall"));
+        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.right * direction, 1, LayerMask.GetMask("Wall")|LayerMask.GetMask("Boss"));
+
+        return (rayHit.collider != null);
+
+    }
+    bool checkbossAhead() {
+        float direction = Mathf.Sign(transform.localScale.x); // 플레이어의 방향을 구함
+        Vector2 raycastStart = rigid.position + Vector2.right * 0.5f * -direction;
+
+        RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.right * direction, 1, LayerMask.GetMask("Wall")|LayerMask.GetMask("Boss"));
 
         return (rayHit.collider != null);
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public enum Type{Shiled, normal};
+    public enum Type{Shiled, normal,Boss};
     public Type enemyType;
     public int maxHealth = 100;
     public int curHelath;
@@ -15,7 +15,6 @@ public class Enemy : MonoBehaviour
     public Rigidbody2D rigid;
     public GameObject MSword;
     Player player;
-    public Collider2D enemycollider;
     void Start() {
         player = GameObject.FindWithTag("Player").GetComponent<Player>();
         if(enemyType == Type.normal){
@@ -24,7 +23,7 @@ public class Enemy : MonoBehaviour
     }
     void Awake(){
         sprite = GetComponentsInChildren<SpriteRenderer>();//MeshRenderer에서 material을 뽑아올 때는 소문자로 작성
-        enemycollider = GetComponent<Collider2D>();
+
     }
     void Update(){
         
@@ -115,7 +114,6 @@ public class Enemy : MonoBehaviour
         else if(other.tag =="Skill"){
             Player weapon = other.GetComponentInParent<Player>();
             if(weapon != null){
-                    Debug.Log("0.4");
                 switch(enemyType){
                     case Type.normal:
                         curHelath -= weapon.Sworddamage;
@@ -125,18 +123,19 @@ public class Enemy : MonoBehaviour
                     break;
                 }
                 if(weapon.HammerSkill){
-                    Debug.Log("0.5");
                     isEnter = true;
                 }
                 if(weapon.SwordSkill){
-                    isEnter = true;
+                    if(enemyType != Type.Boss){
+                        Debug.Log("확인중");
+                        isEnter = true;
+                    }else
+                        Debug.Log("보스거름");
                 }
                 Vector3 reactVec = transform.position - other.transform.position;
                 if(weapon.arrowskill){
                     StartCoroutine(ArrowSkillDmg(reactVec));
-                    Debug.Log(1);
                 }
-                    Debug.Log(reactVec);
                 StartCoroutine(OnDamage(reactVec));
             }
         } 
@@ -144,28 +143,21 @@ public class Enemy : MonoBehaviour
     IEnumerator ArrowSkillDmg(Vector3 reactVec){
         StartCoroutine(OnDamage(reactVec));
         curHelath -= player.Sworddamage;
-                    Debug.Log(2);
         yield return new WaitForSeconds(0.1f);
         curHelath -= player.Sworddamage;
         StartCoroutine(OnDamage(reactVec));
-                    Debug.Log(3);
         yield return new WaitForSeconds(0.1f);
         curHelath -= player.Sworddamage;
         
         yield return new WaitForSeconds(0.1f);
-                    Debug.Log(4);
     }
     IEnumerator OnDamage(Vector3 reactVec){
-                    Debug.Log(5.1);
         foreach(SpriteRenderer mesh in sprite)
             mesh.color = Color.red;
-                    Debug.Log(5.2);
         yield return new WaitForSeconds(0.1f);
 
         if(curHelath > 0){
-                    Debug.Log(6.1);
             foreach(SpriteRenderer mesh in sprite){
-                    Debug.Log(6.2);
                 mesh.color = Color.white;
                 reactVec = reactVec.normalized;
                 rigid.AddForce(reactVec * 5, ForceMode2D.Impulse);
@@ -188,7 +180,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(OnDamage(Vector3.zero)); // OnDamage 함수를 호출하여 피해를 입힙니다.
 
     }
-    public IEnumerator skillDmg(int damageAmount)
+    public IEnumerator skillDmg()
     {
         yield return new WaitForSeconds(0.1f);
 
