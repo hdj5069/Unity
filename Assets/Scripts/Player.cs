@@ -790,10 +790,8 @@ public class Player : MonoBehaviour{
         }    
         Hammer.tag = "Hammer";
         hamtag.tag = "Hammer";
-        // OnBow();
+        
         enemyRigid.gravityScale = 1f;
-        // ShootBullet(enemy);   
-        // yield return new WaitForSeconds(0.2f);
         
     }
     
