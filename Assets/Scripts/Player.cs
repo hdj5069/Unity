@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Callbacks;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -38,6 +40,7 @@ public class Player : MonoBehaviour{
     private float detectionDistance = 5f; 
     [SerializeField]private LayerMask floorLayer;
     [SerializeField]private GameObject hamtag;
+    public float distanceBetweenImages;
     bool isSkill,isSkillasd;
     bool skillasCol,skillsdCol,skilladCol,skillasdCol;
     float holdingkey = 0f;
@@ -47,6 +50,13 @@ public class Player : MonoBehaviour{
     bool isMove,isJump,isDash,isDashCool,isagainJump;
     bool isArrow,isHammer,isSword;
     public bool HammerSkill,SwordSkill,arrowskill;
+    private float dashTimeLeft;
+    private float lastImageXpos;
+    private float lastDash = -100f;
+    public float dashTime;
+    public float dashSpeed;
+    public float dashCooldown;
+
     public int a;
     float targetTime = -Mathf.Infinity;
     Rigidbody2D rigid;
@@ -64,16 +74,27 @@ public class Player : MonoBehaviour{
         anim = GetComponent<Animator>();
     }
     void Update() {
+        // if(rigid.velocity.y < 0){
+        //     if(anim.GetBool("isJump")){
+        //         anim.SetBool("isJump",false);
+
+        //     }
+        //     anim.SetBool("fall",true);
+        // }
         // isMove = true;
         if(!isMove){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
-                anim.SetBool("isJump",true);
+                anim.SetBool("isFall",true);
+            // anim.SetTrigger("fall");
+
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             }else if(Input.GetButtonDown("Vertical") && !isagainJump){
                 float jumpagagin = againjump;
                 isagainJump = true;
+                
+
                 if(rigid.velocity.y < 0){
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 }else if(rigid.velocity.y > 0){
@@ -103,6 +124,7 @@ public class Player : MonoBehaviour{
             anim.SetBool("isRun",false);
         }
         SkillPriority();
+        
     }
 
     void FixedUpdate() {
@@ -113,9 +135,12 @@ public class Player : MonoBehaviour{
                 rigid.velocity = new Vector2(maxSpeed*(-1),rigid.velocity.y);
             }
         
+        CheckDash();
         if(checkGrounded()){
             isJump = false;
             isagainJump = false;
+            anim.SetBool("isFall",false);
+            Debug.Log("왜 안도님");
         }
     }
     bool prac;
@@ -211,25 +236,54 @@ public class Player : MonoBehaviour{
             isArrow = false;
         }
         else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool){
-            isDash = true;
-            isDashCool = true;
-            Vector2 dashDirection = new Vector2(-transform.localScale.x, 0f).normalized;
-            Vector2 startPos = rigid.position;
-            float dashSpeed = 50f;
-            float maxDash = 5f;
-            rigid.velocity = dashDirection * dashSpeed;
-            Invoke("DashOut", maxDash / dashSpeed); // 최대 대시 거리에 도달하면 일정 시간 후에 대시를 멈춥니다.
+            // isDash = true;
+            // isDashCool = true;
+            // Vector2 dashDirection = new Vector2(-transform.localScale.x, 0f).normalized;
+            // Vector2 startPos = rigid.position;
+            // float dashSpeed = 50f;
+            // float maxDash = 5f;
+            // rigid.velocity = dashDirection * dashSpeed;
+            // Invoke("DashOut", maxDash / dashSpeed); // 최대 대시 거리에 도달하면 일정 시간 후에 대시를 멈춥니다.
+            AttemptToDash();
         }
     }
-    
-    void DashOut(){
-        isDash = false;
-        rigid.velocity = Vector2.zero;
-        Invoke("DashCool",2f);
+    void AttemptToDash(){
+        isDashCool = true;
+        isDash = true;
+        dashTimeLeft = dashTime;
+        lastDash = Time.time;
+
+        PlayerAfterImgPool.Instance.GetFromPool();
+        Debug.Log("작동함?");
+        lastImageXpos = transform.position.x;
     }
-    void DashCool(){
+    void CheckDash(){
+        if(isDash){
+            if(dashTimeLeft > 0){
+                isMove = true;
+                
+                float direction = transform.localScale.x > 0 ? -1 : 1;
+                rigid.velocity = new Vector2(dashSpeed * direction ,0f);
+                dashTimeLeft -= Time.deltaTime;
+
+                if(Mathf.Abs(transform.position.x - lastImageXpos) > distanceBetweenImages){
+                    PlayerAfterImgPool.Instance.GetFromPool();
+                    lastImageXpos = transform.position.x;
+                }
+            }
+            if(dashTimeLeft <= 0 || checkWallAhead()){
+                isMove = false;
+                isDash = false;
+                rigid.velocity = Vector2.zero;
+
+                Invoke("DashOut",0.7f);
+            }
+        }
+    }
+    void DashOut(){
         isDashCool = false;
     }
+
 
     void SkillAS(){
         Debug.Log("A와 S키가 동시에 눌렀습니다.");
@@ -845,7 +899,11 @@ public class Player : MonoBehaviour{
         RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.down, 1, LayerMask.GetMask("Floor")|LayerMask.GetMask("Enemy"));
         if(rigid.velocity.y < 0){
             if (rayHit.collider != null && rayHit.distance < 0.3f) {
-                anim.SetBool("isJump",false);
+                // anim.SetBool("isJump",false);
+                anim.SetBool("isfall",false);
+                // anim.StopPlayback();
+                // anim.ResetTrigger("fall");
+                Debug.Log("1");
                 return true;
             } else {
                 return false;
