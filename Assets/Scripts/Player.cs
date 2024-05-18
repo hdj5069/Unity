@@ -20,6 +20,9 @@ public class Player : MonoBehaviour{
 
     public int skillasdmg;
     [Header("건들지마")]
+    public int PlayerMaxHP = 100;
+    public int PlayerCurHP;
+
     [SerializeField]private GameObject Sword;
     [SerializeField]private GameObject Hammer;
     [SerializeField]private GameObject playerPrefab;
@@ -63,6 +66,8 @@ public class Player : MonoBehaviour{
     Animator anim;
     bool enemyCheck;
     bool isKeyPressed = false;
+    Enemy enemydmg;
+    EnemyBullet enemybullet;
     void Awake() {
         Enemy[] allEnemies = FindObjectsOfType<Enemy>();
         foreach (Enemy enemy in allEnemies) {
@@ -72,34 +77,36 @@ public class Player : MonoBehaviour{
         rigid = GetComponent<Rigidbody2D>(); 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();  
         anim = GetComponent<Animator>();
+        // enemydmg = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
+        // enemybullet= GameObject.FindWithTag("Enemy").GetComponent<EnemyBullet>();
+    }
+    private void Start() {
+        PlayerCurHP = PlayerMaxHP;
     }
     void Update() {
-        // if(rigid.velocity.y < 0){
-        //     if(anim.GetBool("isJump")){
-        //         anim.SetBool("isJump",false);
+        if(rigid.velocity.y < 0){
+            if(anim.GetBool("isJump")){
+                anim.SetBool("isJump",false);
 
-        //     }
-        //     anim.SetBool("fall",true);
-        // }
+            }
+            // anim.SetBool("fall",true);
+        }
         // isMove = true;
         if(!isMove){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
-                anim.SetBool("isFall",true);
+                anim.SetBool("isJump",true);
             // anim.SetTrigger("fall");
-
                 rigid.velocity = new Vector2(rigid.velocity.x,0);
                 rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             }else if(Input.GetButtonDown("Vertical") && !isagainJump){
                 float jumpagagin = againjump;
                 isagainJump = true;
-                
-
                 if(rigid.velocity.y < 0){
-                rigid.velocity = new Vector2(rigid.velocity.x,0);
+                    rigid.velocity = new Vector2(rigid.velocity.x,0);
                 }else if(rigid.velocity.y > 0){
-                rigid.velocity = new Vector2(rigid.velocity.x,0);
-                jumpagagin = againjump + 0.5f;
+                    rigid.velocity = new Vector2(rigid.velocity.x,0);
+                    jumpagagin = againjump + 0.5f;
                 }
                 rigid.AddForce(Vector2.up * jumpagagin, ForceMode2D.Impulse);
             }
@@ -108,7 +115,7 @@ public class Player : MonoBehaviour{
             }
             float moveInput = Input.GetAxisRaw("Horizontal");
             if (Mathf.Abs(moveInput) > 0) { 
-                transform.localScale = new Vector3(moveInput * -5f, 5f, 1f); // 입력 방향에 따라 scale 값을 조정하여 크기 변경
+                transform.localScale = new Vector3(moveInput * -1f, 1f, 1f); // 입력 방향에 따라 scale 값을 조정하여 크기 변경
             }
         }
         if(Input.GetButton("Horizontal")){
@@ -124,7 +131,12 @@ public class Player : MonoBehaviour{
             anim.SetBool("isRun",false);
         }
         SkillPriority();
-        
+        if(PlayerCurHP > PlayerMaxHP){
+            PlayerCurHP = PlayerMaxHP;
+        }
+        if(PlayerCurHP < 0){
+            Debug.Log("죽음");
+        }
     }
 
     void FixedUpdate() {
@@ -140,7 +152,6 @@ public class Player : MonoBehaviour{
             isJump = false;
             isagainJump = false;
             anim.SetBool("isFall",false);
-            Debug.Log("왜 안도님");
         }
     }
     bool prac;
@@ -236,14 +247,6 @@ public class Player : MonoBehaviour{
             isArrow = false;
         }
         else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool){
-            // isDash = true;
-            // isDashCool = true;
-            // Vector2 dashDirection = new Vector2(-transform.localScale.x, 0f).normalized;
-            // Vector2 startPos = rigid.position;
-            // float dashSpeed = 50f;
-            // float maxDash = 5f;
-            // rigid.velocity = dashDirection * dashSpeed;
-            // Invoke("DashOut", maxDash / dashSpeed); // 최대 대시 거리에 도달하면 일정 시간 후에 대시를 멈춥니다.
             AttemptToDash();
         }
     }
@@ -391,9 +394,12 @@ public class Player : MonoBehaviour{
     void AtkCool(string AtkEnum){
         if(AtkEnum == "Hammer"){
             HammerCool = true;
+            // HammerCollider.enabled = false;
+
             StartCoroutine("HammerCooldown");   
         }
         else if(AtkEnum == "Sword"){
+            // SwordCollider.enabled = false;
             SwordCool = true;
             StartCoroutine("SwordCooldown");
         }
@@ -467,7 +473,7 @@ public class Player : MonoBehaviour{
             scale.y = 0.7f;
             StartCoroutine("ArrowCooldown");
         }else{
-            scale.y = 3f;
+            scale.y = 1.5f;
             isMove = true;
             rigid.velocity = Vector2.zero;
             yield return new WaitForSeconds(0.5f);
@@ -899,11 +905,10 @@ public class Player : MonoBehaviour{
         RaycastHit2D rayHit = Physics2D.Raycast(raycastStart, Vector2.down, 1, LayerMask.GetMask("Floor")|LayerMask.GetMask("Enemy"));
         if(rigid.velocity.y < 0){
             if (rayHit.collider != null && rayHit.distance < 0.3f) {
-                // anim.SetBool("isJump",false);
-                anim.SetBool("isfall",false);
+                anim.SetBool("isJump",false);
+                // anim.SetBool("isfall",false);
                 // anim.StopPlayback();
                 // anim.ResetTrigger("fall");
-                Debug.Log("1");
                 return true;
             } else {
                 return false;
@@ -960,5 +965,15 @@ public class Player : MonoBehaviour{
         while(!enemy.isEnter){
             yield return null;
         }
+    }
+    void OnTriggerEnter2D(Collider2D other) {
+        var script = other.GetComponent<EnemyBullet>();
+        if(other.tag == "Enemy"){
+            if(script != null){
+            PlayerCurHP = PlayerCurHP - script.ArrowDMG;
+        Debug.Log(PlayerCurHP);
+                // Destroy(other);
+            }
+        }    
     }
 }
