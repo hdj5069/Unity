@@ -21,7 +21,6 @@ public class Enemy : MonoBehaviour
     public bool isDead;
     public bool isEnter;
     public Rigidbody2D rigid;
-    public GameObject MSword;
     bool chasingPlayer;
     Player player;
     Vector2 movement;
@@ -79,24 +78,27 @@ public class Enemy : MonoBehaviour
         }
         Vector2 frontVec = new Vector2(rigid.position.x + nextMove * 0.2f,rigid.position.y);
         Debug.DrawRay(frontVec, Vector3.down, new Color(0,1,0));
-        RaycastHit2D rayHit = Physics2D.Raycast(frontVec,Vector3.down,2,LayerMask.GetMask("Floor"));
+        RaycastHit2D rayHit = Physics2D.Raycast(frontVec,Vector3.down,2,LayerMask.GetMask("Floor")|LayerMask.GetMask("Wall"));
 
         if(rayHit.collider == null){
-            chasingPlayer = false;
-            nextMove = nextMove * -1;
 
-            // CancelInvoke();
-            Invoke("Think",0.5f);
+            chasingPlayer = false;
+            
+            nextMove = nextMove * -1;
+            Invoke("Think",5f);
+            
+        }
+        if(rayHit.collider!=null&&rayHit.collider.tag == "Wall"){
+            nextMove = nextMove * -1;
         }
         if(!chasingPlayer){
             rigid.velocity = new Vector2(nextMove, rigid.velocity.y);
         }else if(chasingPlayer){
-            
             if(movement.x > 0){
                 transform.localScale = new Vector3(1,1,1);
             }
             else if(movement.x < 0){
-            transform.localScale = new Vector3(-1,1,1);
+                transform.localScale = new Vector3(-1,1,1);
             }
             MoveCharacter(movement);
         }
@@ -104,9 +106,9 @@ public class Enemy : MonoBehaviour
     }
     void enterplayer(Collider2D collider){
         if (collider.CompareTag("Player")) {
-        chasingPlayer = true;
-        CancelInvoke();
-    }
+            chasingPlayer = true;
+            CancelInvoke();
+        }
     }
     void Think(){
         nextMove = Random.Range(-1,2);
@@ -144,17 +146,17 @@ public class Enemy : MonoBehaviour
                 switch(enemyType){
                     case Type.melee:
                     case Type.ranger:
-                    curHelath -= player.Hammerdamgae;
-                break;
-                case Type.elite:
-                    if(curShiled >= 0){
-                        curShiled -= 40;
-                    }
-                    else{
                         curHelath -= player.Hammerdamgae;
-                    }
-                break;
-            }
+                    break;
+                    case Type.elite:
+                        if(curShiled >= 0){
+                            curShiled -= 40;
+                        }
+                        else{
+                            curHelath -= player.Hammerdamgae;
+                        }
+                    break;
+                }
                 Vector3 reactVec = transform.position - other.transform.position;
                 StartCoroutine(OnDamage(reactVec));
             }
@@ -179,19 +181,17 @@ public class Enemy : MonoBehaviour
                     switch(enemyType){
                     case Type.melee:
                     case Type.ranger:
-                    curHelath -= bulletd.bulletdamgae;
+                        curHelath -= bulletd.bulletdamgae;
                     break;
                     case Type.elite:
-                    if(curShiled >= 0){
-                        curShiled -= 1;
-                    }
-                    else{
-                    curHelath -= bulletd.bulletdamgae;
-                    }
+                        if(curShiled >= 0){
+                            curShiled -= 1;
+                        }
+                        else{
+                        curHelath -= bulletd.bulletdamgae;
+                        }
                     break;
-                }
-                    // curHelath -= bulletd.bulletdamgae;
-                    
+                    }
                     Vector3 reactVec = transform.position - other.transform.position;
                     StartCoroutine(OnDamage(reactVec));
                 }

@@ -201,16 +201,13 @@ public class Player : MonoBehaviour{
             isHammer = true;
             isKeyPressed = true;
             holdingkey = Time.time;
-            Debug.Log("눌림");
             OnHammmer();
             anim.SetBool("isCharge",true);
             anim.SetBool("doHammer",true);
         }else if(Input.GetButtonUp("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&isHammer){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
-                Debug.Log(Pressduration);
                 if(Pressduration < 1f){
-                    Debug.Log("일반헤머");
 
                     anim.SetBool("isCharge",false);
                     anim.SetBool("doHammer",false);
@@ -219,7 +216,6 @@ public class Player : MonoBehaviour{
                     AtkCool("Hammer");
                 }
                 else if(Pressduration >= 1f){
-                Debug.Log("헤머");
                     ChargeAttack("Hammer");
                 }
             }
@@ -257,7 +253,6 @@ public class Player : MonoBehaviour{
         lastDash = Time.time;
 
         PlayerAfterImgPool.Instance.GetFromPool();
-        Debug.Log("작동함?");
         lastImageXpos = transform.position.x;
     }
     void CheckDash(){
@@ -291,7 +286,6 @@ public class Player : MonoBehaviour{
     void SkillAS(){
         Debug.Log("A와 S키가 동시에 눌렀습니다.");
         if(anim.GetBool("doSword")){
-            Debug.Log("?");
             anim.SetBool("isCharge",false);
             anim.SetBool("doSword",false);
         }
@@ -394,12 +388,9 @@ public class Player : MonoBehaviour{
     void AtkCool(string AtkEnum){
         if(AtkEnum == "Hammer"){
             HammerCool = true;
-            // HammerCollider.enabled = false;
-
             StartCoroutine("HammerCooldown");   
         }
         else if(AtkEnum == "Sword"){
-            // SwordCollider.enabled = false;
             SwordCool = true;
             StartCoroutine("SwordCooldown");
         }
@@ -411,10 +402,8 @@ public class Player : MonoBehaviour{
     void ChargeAttack(string AtkEnum){
         if(AtkEnum == "Sword"){
             StartCoroutine("ChargeSword");
-            
         }
-        else if(AtkEnum == "Hammer"){
-            
+        else if(AtkEnum == "Hammer"){            
             StartCoroutine("ChargeHammer"); 
         }
         else if(AtkEnum == "Arrow"){
@@ -819,7 +808,6 @@ public class Player : MonoBehaviour{
         float sTime = Time.time;
         Rigidbody2D enemyRigid = enemy.GetComponent<Rigidbody2D>();
         enemyRigid.gravityScale = 0f;
-        Debug.Log("stime"+sTime);
         curveDuration = 0.8f;
         while ((Time.time - sTime) < curveDuration && !stopMove) {
         float fractionOfJourney = (Time.time - sTime) / curveDuration;
@@ -833,7 +821,6 @@ public class Player : MonoBehaviour{
         
         RaycastHit2D hit = Physics2D.Raycast(enemy.position, Vector2.up, 1f ,floorLayer);
             if (hit.collider != null) {
-                Debug.Log("Raycast hit: " + hit.collider);
                 Vector3 hitPoint = hit.point;
                 Vector3 newTargetPos = new Vector3(hitPoint.x, hitPoint.y - 1.5f, 0f); 
                 
@@ -852,7 +839,6 @@ public class Player : MonoBehaviour{
         hamtag.tag = "Hammer";
         
         enemyRigid.gravityScale = 1f;
-        
     }
     
     void ShootBullet(Transform enemy){
@@ -951,10 +937,8 @@ public class Player : MonoBehaviour{
         skillasdCol = false;
     }
     bool CheckEnter(){
-        foreach (Enemy enemy in enemies)
-        {
-            if (enemy != null && enemy.isEnter)
-            {
+        foreach (Enemy enemy in enemies){
+            if (enemy != null && enemy.isEnter){
                 return true;
             }
         }
@@ -968,12 +952,24 @@ public class Player : MonoBehaviour{
     }
     void OnTriggerEnter2D(Collider2D other) {
         var script = other.GetComponent<EnemyBullet>();
+        var BossRock = other.GetComponent<rock>();
+        var Boss = other.GetComponentInParent<Boss>();
+
         if(other.tag == "Enemy"){
             if(script != null){
-            PlayerCurHP = PlayerCurHP - script.ArrowDMG;
-        Debug.Log(PlayerCurHP);
-                // Destroy(other);
+                PlayerCurHP = PlayerCurHP - script.ArrowDMG;
+                Debug.Log(PlayerCurHP);
             }
         }    
+        if(other.tag == "Boss"){
+            if(BossRock != null){
+                PlayerCurHP -= BossRock.BossRockDmg;
+            }
+            if(Boss!=null){
+                PlayerCurHP -= Boss.laserDmg;
+                Debug.Log(Boss.laserDmg);
+                Debug.Log("레이저맞음");
+            }
+        }
     }
 }
