@@ -954,7 +954,7 @@ public class Player : MonoBehaviour{
         var script = other.GetComponent<EnemyBullet>();
         var BossRock = other.GetComponent<rock>();
         var Boss = other.GetComponentInParent<Boss>();
-
+        Debug.Log("충돌"+other.name);
         if(other.tag == "Enemy"){
             if(script != null){
                 PlayerCurHP = PlayerCurHP - script.ArrowDMG;
@@ -965,10 +965,19 @@ public class Player : MonoBehaviour{
             if(BossRock != null){
                 PlayerCurHP -= BossRock.BossRockDmg;
             }
+        }
+        if(other.tag == "Bosslaser"){
             if(Boss!=null){
                 PlayerCurHP -= Boss.laserDmg;
                 Debug.Log(Boss.laserDmg);
                 Debug.Log("레이저맞음");
+            }
+        }
+        if(other.tag == "BossDMG"){
+            if(Boss!=null){
+                PlayerCurHP -= Boss.flooringdmg;
+                Debug.Log("장판데미지");
+                Debug.Log(PlayerCurHP);
             }
         }
     }
