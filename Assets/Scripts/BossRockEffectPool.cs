@@ -17,6 +17,7 @@ public class BossRockEffectPool : MonoBehaviour
     private void InitializePool() {
         for (int i = 0; i < poolSize; i++) {
             GameObject effect = Instantiate(effectPrefab);
+            effect.transform.SetParent(transform);
             effect.SetActive(false);
             effectsPool.Enqueue(effect);
         }
