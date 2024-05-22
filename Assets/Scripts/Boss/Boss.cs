@@ -10,7 +10,6 @@ public class Boss : MonoBehaviour
     [SerializeField]private GameObject rockStart;
     [SerializeField]private GameObject tlaser;
     [SerializeField]private GameObject laser;
-    // [SerializeField]private BoxCollider2D sadFlooring;
     public int flooringdmg;
     BoxCollider2D sadFlooring;
     public float dropInterval = 3f;
@@ -54,7 +53,6 @@ public class Boss : MonoBehaviour
         if(saddoor){
             pattern1timer += Time.deltaTime;
             if(timer > 5f){
-                // Vector3 dropPosition = GetRandomPointInBox();
                 Vector3 droppos = rockStart.transform.position;
                 droppos.y = 0;
                 StartCoroutine(sadfloor(droppos));
@@ -62,7 +60,6 @@ public class Boss : MonoBehaviour
             }
             if(!ispattern){
                 if(pattern1timer >= 3f){
-                    // Vector3 dropPosition = GetRandomPointInBox();
                     StartCoroutine("SadPattern2");
                     pattern1timer = 0;
                     ispattern = true;
@@ -72,6 +69,7 @@ public class Boss : MonoBehaviour
                 saddoor = false;
                 angerdoor = true;
                 happydoor = false;
+                BossEffectPool.Instance.ReturnEffectall();
                 transtimer = 0;
             }
         }
@@ -157,12 +155,7 @@ public class Boss : MonoBehaviour
         sadFlooring.enabled = true;
 
         if(transtimer >= 16f){
-            BossEffectPool.Instance.ReturnEffectall();
             Debug.Log("?");
-            // BossEffectPool.Instance.ReturnfloorEffect(sadflooreffect);
         }
-        
     }
-    // void returnsad(){
-    // }
 }

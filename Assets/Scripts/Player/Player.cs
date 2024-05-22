@@ -712,7 +712,6 @@ public class Player : MonoBehaviour{
         isKeyPressed = false;
     }
     bool skillsdTime() {
-        Debug.Log(Time.time - targetTime);
         if (Time.time - targetTime >= 1.5f) { 
             return true;
         } else {
@@ -720,7 +719,6 @@ public class Player : MonoBehaviour{
         }
     }
     bool skilalsdTime() {
-        Debug.Log(Time.time - targetTime);
         if (Time.time - targetTime >= 2f) { 
             return true;
         } else {
@@ -728,7 +726,6 @@ public class Player : MonoBehaviour{
         }
     }
     bool chargeHamTime() {
-        Debug.Log(Time.time - targetTime);
         if (Time.time - targetTime >= 0.6f) { 
             return true;
         } else {
