@@ -30,6 +30,8 @@ public class Enemy : MonoBehaviour
     BoxCollider2D boxCollider;
     CapsuleCollider2D capsulechase;
     public int nextMove;
+    float timer;
+    bool checktimer;
     [SerializeField]private Detector playerchase;
     [SerializeField]private Detector attackpoint;
     [SerializeField]private Detector rangeATK = null;
@@ -64,19 +66,19 @@ public class Enemy : MonoBehaviour
     }
     void Update(){
         Vector2 direction = player.transform.position - transform.position;
-        direction.Normalize();
-        movement = direction;
-        
+        movement = new Vector2(Mathf.Sign(direction.x),Mathf.Sign(direction.y));
+        if(checktimer)
+            timer += Time.deltaTime;
     }
     void FixedUpdate(){
         if(nextMove > 0){
-            transform.localScale = new Vector3(1,1,1);
+            transform.localScale = new Vector3(0.7f,0.7f,0.7f);
         }else if(nextMove < 0){
-            transform.localScale = new Vector3(-1,1,1);
+            transform.localScale = new Vector3(-0.7f,0.7f,0.7f);
         }
         else{
         }
-        Vector2 frontVec = new Vector2(rigid.position.x + nextMove * 0.2f,rigid.position.y);
+        Vector2 frontVec = new Vector2(rigid.position.x + nextMove * speed,rigid.position.y);
         Debug.DrawRay(frontVec, Vector3.down, new Color(0,1,0));
         RaycastHit2D rayHit = Physics2D.Raycast(frontVec,Vector3.down,2,LayerMask.GetMask("Floor")|LayerMask.GetMask("Wall"));
 
@@ -84,22 +86,33 @@ public class Enemy : MonoBehaviour
 
             chasingPlayer = false;
             
+        
             nextMove = nextMove * -1;
+            
             Invoke("Think",5f);
             
         }
         if(rayHit.collider!=null&&rayHit.collider.tag == "Wall"){
-            nextMove = nextMove * -1;
+            checktimer = true;
+            if(timer >= 5f){
+                chasingPlayer = false;
+                nextMove = nextMove * -1;
+                Invoke("Think",5f);
+                Debug.Log("?");
+                checktimer = false;
+                timer = 0;
+            }
         }
         if(!chasingPlayer){
             rigid.velocity = new Vector2(nextMove, rigid.velocity.y);
         }else if(chasingPlayer){
-            if(movement.x > 0){
-                transform.localScale = new Vector3(1,1,1);
-            }
-            else if(movement.x < 0){
-                transform.localScale = new Vector3(-1,1,1);
-            }
+            nextMove = Mathf.RoundToInt(movement.x);
+            // if(movement.x > 0){
+            //     transform.localScale = new Vector3(1,1,1);
+            // }
+            // else if(movement.x < 0){
+            //     transform.localScale = new Vector3(-1,1,1);
+            // }
             MoveCharacter(movement);
         }
 

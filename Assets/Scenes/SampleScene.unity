@@ -5196,7 +5196,11 @@ MonoBehaviour:
   dropInterval: 3
   laserinterval: 1
   laserDmg: 100
+  angerdoor: 1
+  saddoor: 0
+  happydoor: 0
   transtimer: 60
+  isRestrict: 0
 --- !u!212 &105141997
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -13543,6 +13547,7 @@ MonoBehaviour:
     m_Bits: 64
   hamtag: {fileID: 6863142852977348973}
   distanceBetweenImages: 0.1
+  isMove: 0
   HammerSkill: 0
   SwordSkill: 0
   arrowskill: 0
@@ -25412,7 +25417,7 @@ GameObject:
   - component: {fileID: 1627927698}
   - component: {fileID: 1627927697}
   m_Layer: 0
-  m_Name: EffectPool
+  m_Name: BossEffectPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25432,6 +25437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 3036007310690256411, guid: f3557aa97202691499d528f72d83e001, type: 3}
   flooreffect: {fileID: 4259667028585457869, guid: d77d3235a6fc6df4c85837911e2d3a2a, type: 3}
+  SadPattern2Effect: {fileID: 4259667028585457869, guid: d77d3235a6fc6df4c85837911e2d3a2a, type: 3}
   bossParent: {fileID: 1254930506}
   poolSize: 10
 --- !u!4 &1627927698
@@ -31096,7 +31102,7 @@ Transform:
   m_GameObject: {fileID: 1927014355}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.6, y: 2.4, z: 0}
+  m_LocalPosition: {x: -4.68, y: 1.09, z: 0}
   m_LocalScale: {x: 3, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

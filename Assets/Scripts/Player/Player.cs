@@ -50,7 +50,8 @@ public class Player : MonoBehaviour{
     float curveDuration = 0.1f;
     SpriteRenderer spriteRenderer;
     bool HammerCool,SwordCool,ArrowCool;
-    bool isMove,isJump,isDash,isDashCool,isagainJump;
+    public bool isMove;
+    bool isJump,isDash,isDashCool,isagainJump;
     bool isArrow,isHammer,isSword;
     public bool HammerSkill,SwordSkill,arrowskill;
     private float dashTimeLeft;
@@ -64,10 +65,12 @@ public class Player : MonoBehaviour{
     float targetTime = -Mathf.Infinity;
     Rigidbody2D rigid;
     Animator anim;
+    int count;
     bool enemyCheck;
     bool isKeyPressed = false;
     Enemy enemydmg;
     EnemyBullet enemybullet;
+    Boss boss;
     void Awake() {
         Enemy[] allEnemies = FindObjectsOfType<Enemy>();
         foreach (Enemy enemy in allEnemies) {
@@ -77,6 +80,7 @@ public class Player : MonoBehaviour{
         rigid = GetComponent<Rigidbody2D>(); 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();  
         anim = GetComponent<Animator>();
+        boss = GameObject.FindWithTag("Boss").GetComponent<Boss>();
         // enemydmg = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
         // enemybullet= GameObject.FindWithTag("Enemy").GetComponent<EnemyBullet>();
     }
@@ -84,6 +88,24 @@ public class Player : MonoBehaviour{
         PlayerCurHP = PlayerMaxHP;
     }
     void Update() {
+        if(isMove &&boss.isRestrict ){
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionY|RigidbodyConstraints2D.FreezeRotation;
+            rigid.velocity = Vector2.zero;
+            transform.localScale = new Vector3(-1f, 1f, 1f);
+            if(Input.GetButtonDown("Horizontal")){
+                count++;
+            }
+            if(count >= 8){
+                isMove = false;
+                rigid.constraints = RigidbodyConstraints2D.None|RigidbodyConstraints2D.FreezeRotation;
+                boss.isRestrict = false;
+                count = 0;
+            }
+        }
+        // if(!isMove &&!boss.isRestrict){
+        //     // Debug.Log("33");
+
+        // }
         if(rigid.velocity.y < 0){
             if(anim.GetBool("isJump")){
                 anim.SetBool("isJump",false);
@@ -242,7 +264,7 @@ public class Player : MonoBehaviour{
             AtkCool("Arrow");
             isArrow = false;
         }
-        else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool){
+        else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool&&!boss.isRestrict){
             AttemptToDash();
         }
     }

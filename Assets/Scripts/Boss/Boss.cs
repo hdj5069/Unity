@@ -16,25 +16,28 @@ public class Boss : MonoBehaviour
     public float dropInterval = 3f;
     public float laserinterval = 6f;
     public int laserDmg;
-    bool angerdoor = true;
-    bool saddoor = false;
-    bool happydoor = false;
+    public bool angerdoor = true;
+    public bool saddoor = false;
+    public bool happydoor = false;
+    GameObject sadflooreffect;
     bool islaser;
     int lasery;
     float timer;
-    float laserTimer;
+    float pattern1timer;
+    bool ispattern;
     public float transtimer = 0;
+    public bool isRestrict;
     Rigidbody2D rigid;
     void Update() {
         timer += Time.deltaTime;
+        transtimer += Time.deltaTime;
         if(angerdoor){
-            transtimer += Time.deltaTime;
                 if(!islaser){
-                laserTimer += Time.deltaTime;
+                pattern1timer += Time.deltaTime;
                 }
-            if(laserTimer >= laserinterval){
+            if(pattern1timer >= laserinterval){
                     StartCoroutine("Laser");
-                laserTimer = 0;
+                pattern1timer = 0;
             }
             if(timer >= dropInterval){   
                 Vector3 dropPosition = GetRandomPointInBox();
@@ -45,15 +48,32 @@ public class Boss : MonoBehaviour
                 saddoor = true;
                 angerdoor = false;
                 happydoor = false;
+                transtimer = 0;
             }
         }
         if(saddoor){
+            pattern1timer += Time.deltaTime;
             if(timer > 5f){
-                Vector3 dropPosition = GetRandomPointInBox();
-                StartCoroutine(sadfloor(dropPosition));
+                // Vector3 dropPosition = GetRandomPointInBox();
+                Vector3 droppos = rockStart.transform.position;
+                droppos.y = 0;
+                StartCoroutine(sadfloor(droppos));
                 timer = 0;
             }
-            
+            if(!ispattern){
+                if(pattern1timer >= 3f){
+                    // Vector3 dropPosition = GetRandomPointInBox();
+                    StartCoroutine("SadPattern2");
+                    pattern1timer = 0;
+                    ispattern = true;
+                }
+            }
+            if(transtimer >= 20f){
+                saddoor = false;
+                angerdoor = true;
+                happydoor = false;
+                transtimer = 0;
+            }
         }
     }
     private void Awake() {
@@ -63,7 +83,7 @@ public class Boss : MonoBehaviour
     IEnumerator Laser(){
         int y = Random.Range(0,3);
         islaser = true;
-        laserTimer = 0;
+        pattern1timer = 0;
         if(y == 0){
             lasery = -1;
             tlaser.transform.position = new Vector3(tlaser.transform.position.x,lasery,0); 
@@ -84,19 +104,37 @@ public class Boss : MonoBehaviour
         laser.SetActive(true);
         yield return new WaitForSeconds(1f);
         laser.SetActive(false);
-        laserTimer = 0;
+        pattern1timer = 0;
         islaser = false;
     }
     IEnumerator DropWithEffect(Vector3 position) {
-        GameObject effect = BossRockEffectPool.Instance.GetEffect();
+        GameObject effect = BossEffectPool.Instance.GetEffect();
         effect.transform.position = new Vector3(position.x,-2.5f,0);
         yield return new WaitForSeconds(2f); 
-        BossRockEffectPool.Instance.ReturnEffect(effect);
+        BossEffectPool.Instance.ReturnEffect(effect);
         yield return new WaitForSeconds(0.3f); 
         GameObject drop = BossRockPool.Instance.GetFromPool();
         drop.transform.position = position;
         yield return new WaitForSeconds(2f); 
         BossRockPool.Instance.AddToPool(drop);
+    }
+    IEnumerator SadPattern2() {
+
+        // GameObject effect = BossEffectPool.Instance.GetSadPattern2();
+        // effect.transform.position = new Vector3(position.x,-2.5f,0);
+        // yield return new WaitForSeconds(2f); 
+        // BossEffectPool.Instance.ReturnSadPattern2();
+        Player player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player.isMove = true;
+        isRestrict = true;
+        
+        yield return new WaitForSeconds(0.3f); 
+
+        // GameObject drop = BossRockPool.Instance.GetFromPool();
+
+        // drop.transform.position = position;
+        // yield return new WaitForSeconds(2f); 
+        // BossRockPool.Instance.AddToPool(drop);
     }
     Vector3 GetRandomPointInBox(){
         BoxCollider2D collider = rockStart.GetComponent<BoxCollider2D>();
@@ -112,14 +150,19 @@ public class Boss : MonoBehaviour
         return rockStart.transform.position;
     }
     IEnumerator sadfloor(Vector3 position){
-        GameObject effect = BossRockEffectPool.Instance.GetfloorEffect();
-        effect.transform.position = new Vector3(position.x,-2.5f,0);
+        sadflooreffect = BossEffectPool.Instance.GetfloorEffect();
+        sadflooreffect.transform.position = new Vector3(position.x,-2.5f,0);
         yield return new WaitForSeconds(1f);
-        sadFlooring = effect.GetComponent<BoxCollider2D>();
+        sadFlooring = sadflooreffect.GetComponent<BoxCollider2D>();
         sadFlooring.enabled = true;
+
+        if(transtimer >= 19f){
+            BossEffectPool.Instance.ReturnEffectall();
+            Debug.Log("?");
+            // BossEffectPool.Instance.ReturnfloorEffect(sadflooreffect);
+        }
         
     }
-    void returnsad(){
-        // BossRockEffectPool.Instance.ReturnfloorEffect();
-    }
+    // void returnsad(){
+    // }
 }
