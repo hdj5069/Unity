@@ -125,7 +125,7 @@ public class Boss : MonoBehaviour
         // yield return new WaitForSeconds(2f); 
         // BossEffectPool.Instance.ReturnSadPattern2();
         Player player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        player.isMove = true;
+        player.bossskill = true;
         isRestrict = true;
         
         yield return new WaitForSeconds(0.3f); 
@@ -156,7 +156,7 @@ public class Boss : MonoBehaviour
         sadFlooring = sadflooreffect.GetComponent<BoxCollider2D>();
         sadFlooring.enabled = true;
 
-        if(transtimer >= 19f){
+        if(transtimer >= 16f){
             BossEffectPool.Instance.ReturnEffectall();
             Debug.Log("?");
             // BossEffectPool.Instance.ReturnfloorEffect(sadflooreffect);

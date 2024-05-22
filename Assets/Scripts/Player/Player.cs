@@ -50,8 +50,8 @@ public class Player : MonoBehaviour{
     float curveDuration = 0.1f;
     SpriteRenderer spriteRenderer;
     bool HammerCool,SwordCool,ArrowCool;
-    public bool isMove;
-    bool isJump,isDash,isDashCool,isagainJump;
+    public bool bossskill;
+    bool isMove,isJump,isDash,isDashCool,isagainJump;
     bool isArrow,isHammer,isSword;
     public bool HammerSkill,SwordSkill,arrowskill;
     private float dashTimeLeft;
@@ -88,7 +88,7 @@ public class Player : MonoBehaviour{
         PlayerCurHP = PlayerMaxHP;
     }
     void Update() {
-        if(isMove &&boss.isRestrict ){
+        if(bossskill &&boss.isRestrict ){
             rigid.constraints = RigidbodyConstraints2D.FreezePositionY|RigidbodyConstraints2D.FreezeRotation;
             rigid.velocity = Vector2.zero;
             transform.localScale = new Vector3(-1f, 1f, 1f);
@@ -96,7 +96,7 @@ public class Player : MonoBehaviour{
                 count++;
             }
             if(count >= 8){
-                isMove = false;
+                bossskill = false;
                 rigid.constraints = RigidbodyConstraints2D.None|RigidbodyConstraints2D.FreezeRotation;
                 boss.isRestrict = false;
                 count = 0;
@@ -114,7 +114,7 @@ public class Player : MonoBehaviour{
             // anim.SetBool("fall",true);
         }
         // isMove = true;
-        if(!isMove){
+        if(!isMove&&!bossskill){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
                 anim.SetBool("isJump",true);
@@ -141,7 +141,7 @@ public class Player : MonoBehaviour{
             }
         }
         if(Input.GetButton("Horizontal")){
-            if(!isMove){
+            if(!isMove&&!bossskill){
                 float h = Input.GetAxisRaw("Horizontal");
                 rigid.AddForce(Vector2.right * h, ForceMode2D.Impulse);
                 anim.SetBool("isRun",true);
@@ -178,33 +178,33 @@ public class Player : MonoBehaviour{
     }
     bool prac;
     void SkillPriority(){
-        if (Input.GetKey(KeyCode.A) &&Input.GetKey(KeyCode.S) &&Input.GetKey(KeyCode.D) && !skillasdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+        if (Input.GetKey(KeyCode.A) &&Input.GetKey(KeyCode.S) &&Input.GetKey(KeyCode.D) && !skillasdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill&&!bossskill) {
             skillasdCol = true;
             isSkill = true;
             SkillASD();
         }
-        else if (Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&!Input.GetKey(KeyCode.D) && !skillasCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill) {
+        else if (Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&!Input.GetKey(KeyCode.D) && !skillasCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill&&!bossskill) {
             skillasCol = true;
             isSkill = true;
             arrowskill = true;
             SkillAS();
-        }else if (!Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) && !skillsdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill &&!isJump ) {
+        }else if (!Input.GetKey(KeyCode.A)&&Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) && !skillsdCol && !ArrowCool && !SwordCool && !HammerCool && !isSkill &&!isJump &&!bossskill) {
             skillsdCol = true;
             SkillSD();
             isSkill = true;
         }
-        else if(Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) &&!skilladCol && !ArrowCool && !SwordCool && !HammerCool&& !isSkill &&!isJump){
+        else if(Input.GetKey(KeyCode.A)&&!Input.GetKey(KeyCode.S)&&Input.GetKey(KeyCode.D) &&!skilladCol && !ArrowCool && !SwordCool && !HammerCool&& !isSkill &&!isJump&&!bossskill){
             skilladCol = true;
             SkillAD();
             isSkill = true;
-        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer&&!isSword){
+        }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer&&!isSword&&!bossskill){
             OnSword();
             isSword = true;
             isKeyPressed = true;
             holdingkey = Time.time;
             anim.SetBool("isCharge",true);
             anim.SetBool("doSword",true);
-        }else if(Input.GetButtonUp("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool && isSword){
+        }else if(Input.GetButtonUp("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool && isSword&&!bossskill){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
                 if(Pressduration < 1f){
@@ -219,14 +219,14 @@ public class Player : MonoBehaviour{
                 isSword = false;
                 AtkCool("Sword");
             }
-        }else if(Input.GetButtonDown("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isSword){
+        }else if(Input.GetButtonDown("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isSword&&!bossskill){
             isHammer = true;
             isKeyPressed = true;
             holdingkey = Time.time;
             OnHammmer();
             anim.SetBool("isCharge",true);
             anim.SetBool("doHammer",true);
-        }else if(Input.GetButtonUp("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&isHammer){
+        }else if(Input.GetButtonUp("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&isHammer&&!bossskill){
             if(isKeyPressed){
                 float Pressduration = Time.time - holdingkey;
                 if(Pressduration < 1f){
@@ -245,13 +245,13 @@ public class Player : MonoBehaviour{
             isHammer = false;
             isKeyPressed = false;
         }
-        else if(Input.GetButtonDown("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill && !isHammer && !isSword){
+        else if(Input.GetButtonDown("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill && !isHammer && !isSword&&!bossskill){
             isArrow = true;
             OnBow();
             anim.SetTrigger("doShot");
             isKeyPressed = true;
             holdingkey = Time.time;
-        }else if(Input.GetButtonUp("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill &&isArrow){
+        }else if(Input.GetButtonUp("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill &&isArrow&&!bossskill){
             float Pressduration = Time.time - holdingkey;
             if(isKeyPressed && Pressduration  >= 1f){
             Debug.Log(Pressduration);
@@ -676,7 +676,7 @@ public class Player : MonoBehaviour{
         // foreach (Enemy enemy in enemies){
         //     StartCoroutine(SkillCheck(enemy));
         // }
-        yield return new WaitUntil(() => CheckEnter()||skilalsdTime());
+        yield return new WaitUntil(() => CheckEnter()||skilalsdTime()||checkWallAhead());
 
         foreach (Enemy enemy in enemies)
         {
