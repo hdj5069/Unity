@@ -5425,9 +5425,8 @@ MonoBehaviour:
   rigid: {fileID: 112885944}
   particle: {fileID: 855919781}
   nextMove: 0
-  playerchase: {fileID: 1634322184}
   attackpoint: {fileID: 2012278474}
-  rangeATK: {fileID: 632274354}
+  fireRate: 2
 --- !u!4 &112885947
 Transform:
   m_ObjectHideFlags: 0
@@ -13432,7 +13431,7 @@ Transform:
   m_GameObject: {fileID: 1119783182}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.41, y: 0.3, z: 0.3}
+  m_LocalPosition: {x: 40.68, y: 0.3, z: 0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13547,7 +13546,7 @@ MonoBehaviour:
     m_Bits: 64
   hamtag: {fileID: 6863142852977348973}
   distanceBetweenImages: 0.1
-  isMove: 0
+  bossskill: 0
   HammerSkill: 0
   SwordSkill: 0
   arrowskill: 0
@@ -24719,9 +24718,8 @@ MonoBehaviour:
   rigid: {fileID: 1459039448}
   particle: {fileID: 1296713595}
   nextMove: 0
-  playerchase: {fileID: 671669245}
   attackpoint: {fileID: 1315377616}
-  rangeATK: {fileID: 0}
+  fireRate: 2
 --- !u!4 &1459039451
 Transform:
   m_ObjectHideFlags: 0
@@ -25636,9 +25634,8 @@ MonoBehaviour:
   rigid: {fileID: 1666256472}
   particle: {fileID: 89261785}
   nextMove: 0
-  playerchase: {fileID: 2054327083}
   attackpoint: {fileID: 900255445}
-  rangeATK: {fileID: 0}
+  fireRate: 2
 --- !u!212 &1666256475
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -31436,9 +31433,8 @@ MonoBehaviour:
   rigid: {fileID: 1998055575}
   particle: {fileID: 1803684155}
   nextMove: 0
-  playerchase: {fileID: 1510555864}
   attackpoint: {fileID: 1403739546}
-  rangeATK: {fileID: 1201043083}
+  fireRate: 2
 --- !u!4 &1998055578
 Transform:
   m_ObjectHideFlags: 0
@@ -31633,7 +31629,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2054327081
 Transform:
   m_ObjectHideFlags: 0
