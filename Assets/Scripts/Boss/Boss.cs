@@ -43,12 +43,12 @@ public class Boss : MonoBehaviour
                 StartCoroutine(DropWithEffect(dropPosition));
                 timer = 0;
             }
-            if(transtimer > 60){
-                saddoor = true;
-                angerdoor = false;
-                happydoor = false;
-                transtimer = 0;
-            }
+            // if(transtimer > 60){
+            //     saddoor = true;
+            //     angerdoor = false;
+            //     happydoor = false;
+            //     transtimer = 0;
+            // }
         }
         if(saddoor){
             pattern1timer += Time.deltaTime;
