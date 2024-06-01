@@ -43,15 +43,14 @@ public class Boss : MonoBehaviour
                 StartCoroutine(DropWithEffect(dropPosition));
                 timer = 0;
             }
-            // if(transtimer > 60){
-            //     saddoor = true;
-            //     angerdoor = false;
-            //     happydoor = false;
-            //     transtimer = 0;
-            // }
+            if(transtimer > 60){
+                saddoor = true;
+                angerdoor = false;
+                happydoor = false;
+                transtimer = 0;
+            }
         }
         if(saddoor){
-            pattern1timer += Time.deltaTime;
             if(timer > 5f){
                 Vector3 droppos = rockStart.transform.position;
                 droppos.y = 0;
@@ -59,24 +58,28 @@ public class Boss : MonoBehaviour
                 timer = 0;
             }
             if(!ispattern){
+                pattern1timer += Time.deltaTime;
                 if(pattern1timer >= 3f){
                     StartCoroutine("SadPattern2");
-                    pattern1timer = 0;
                     ispattern = true;
                 }
             }
-            if(transtimer >= 20f){
-                saddoor = false;
-                angerdoor = true;
-                happydoor = false;
-                BossEffectPool.Instance.ReturnEffectall();
-                transtimer = 0;
-            }
+            // if(transtimer >= 20f){
+            //     saddoor = false;
+            //     angerdoor = true;
+            //     happydoor = false;
+            //     BossEffectPool.Instance.ReturnEffectall();
+            //     transtimer = 0;
+            // }
         }
     }
     private void Awake() {
         rigid = GetComponent<Rigidbody2D>();
-        
+    }
+    public void patternoff(){
+        ispattern = false;
+        isRestrict = false;
+        pattern1timer = 0;
     }
     IEnumerator Laser(){
         int y = Random.Range(0,3);
@@ -118,10 +121,10 @@ public class Boss : MonoBehaviour
     }
     IEnumerator SadPattern2() {
 
-        // GameObject effect = BossEffectPool.Instance.GetSadPattern2();
-        // effect.transform.position = new Vector3(position.x,-2.5f,0);
-        // yield return new WaitForSeconds(2f); 
-        // BossEffectPool.Instance.ReturnSadPattern2();
+        GameObject effect = BossEffectPool.Instance.GetSadPattern2();
+        effect.transform.position = new Vector3(effect.transform.position.x,-2.5f,0);
+        yield return new WaitForSeconds(2f); 
+        BossEffectPool.Instance.ReturnSadPattern2();
         Player player = GameObject.FindWithTag("Player").GetComponent<Player>();
         player.bossskill = true;
         isRestrict = true;

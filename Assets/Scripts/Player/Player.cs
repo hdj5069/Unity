@@ -50,6 +50,7 @@ public class Player : MonoBehaviour{
     float curveDuration = 0.1f;
     SpriteRenderer spriteRenderer;
     bool HammerCool,SwordCool,ArrowCool;
+    bool isAttack;
     public bool bossskill;
     bool isMove,isJump,isDash,isDashCool,isagainJump;
     bool isArrow,isHammer,isSword;
@@ -98,22 +99,16 @@ public class Player : MonoBehaviour{
             if(count >= 8){
                 bossskill = false;
                 rigid.constraints = RigidbodyConstraints2D.None|RigidbodyConstraints2D.FreezeRotation;
-                boss.isRestrict = false;
+                boss.patternoff();
                 count = 0;
             }
         }
-        // if(!isMove &&!boss.isRestrict){
-        //     // Debug.Log("33");
+        // if(rigid.velocity.y < 0){
+        //     if(anim.GetBool("isJump")){
+        //         anim.SetBool("isJump",false);
 
+        //     }
         // }
-        if(rigid.velocity.y < 0){
-            if(anim.GetBool("isJump")){
-                anim.SetBool("isJump",false);
-
-            }
-            // anim.SetBool("fall",true);
-        }
-        // isMove = true;
         if(!isMove&&!bossskill){
             if(Input.GetButtonDown("Vertical") && !isJump){
                 isJump =true;
@@ -150,6 +145,9 @@ public class Player : MonoBehaviour{
             }
             
         }else{
+            anim.SetBool("isRun",false);
+        }
+        if(isMove){
             anim.SetBool("isRun",false);
         }
         SkillPriority();
@@ -198,71 +196,22 @@ public class Player : MonoBehaviour{
             SkillAD();
             isSkill = true;
         }else if(Input.GetButtonDown("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isHammer&&!isSword&&!bossskill){
-            OnSword();
             isSword = true;
-            isKeyPressed = true;
-            holdingkey = Time.time;
-            anim.SetBool("isCharge",true);
-            anim.SetBool("doSword",true);
-        }else if(Input.GetButtonUp("AtkSword")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool && isSword&&!bossskill){
-            if(isKeyPressed){
-                float Pressduration = Time.time - holdingkey;
-                if(Pressduration < 1f){
-                    anim.SetBool("isCharge",false);
-                    anim.SetBool("doSword",false);
-                    
-                    AtkSword();
-                }
-                else if(Pressduration >= 1f){
-                    ChargeAttack("Sword");
-                }
-                isSword = false;
-                AtkCool("Sword");
-            }
+            AtkSword();
+            isSword = false;
+            AtkCool("Sword");
         }else if(Input.GetButtonDown("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&!isArrow&&!isSword&&!bossskill){
             isHammer = true;
-            isKeyPressed = true;
-            holdingkey = Time.time;
-            OnHammmer();
-            anim.SetBool("isCharge",true);
-            anim.SetBool("doHammer",true);
-        }else if(Input.GetButtonUp("AtkHammer")&& !isSkill && !HammerCool && !SwordCool && !ArrowCool&&isHammer&&!bossskill){
-            if(isKeyPressed){
-                float Pressduration = Time.time - holdingkey;
-                if(Pressduration < 1f){
-
-                    anim.SetBool("isCharge",false);
-                    anim.SetBool("doHammer",false);
-                    
-                    AtkHammer();
-                    AtkCool("Hammer");
-                }
-                else if(Pressduration >= 1f){
-                    ChargeAttack("Hammer");
-                }
-            }
-            
+            AtkHammer();
             isHammer = false;
-            isKeyPressed = false;
+            AtkCool("Hammer");
         }
         else if(Input.GetButtonDown("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill && !isHammer && !isSword&&!bossskill){
             isArrow = true;
-            OnBow();
+            AtkArrow();
             anim.SetTrigger("doShot");
-            isKeyPressed = true;
-            holdingkey = Time.time;
-        }else if(Input.GetButtonUp("AtkArrow")&& !SwordCool && !HammerCool && !ArrowCool&& !isSkill &&isArrow&&!bossskill){
-            float Pressduration = Time.time - holdingkey;
-            if(isKeyPressed && Pressduration  >= 1f){
-            Debug.Log(Pressduration);
-                ChargeAttack("Arrow");
-            }
-            else{
-                AtkArrow();
-            }
-            
-            AtkCool("Arrow");
             isArrow = false;
+            AtkCool("Arrow");
         }
         else if(Input.GetButtonDown("Dash")&& !isDash&&!isDashCool&&!boss.isRestrict){
             AttemptToDash();
@@ -362,6 +311,7 @@ public class Player : MonoBehaviour{
     }
 
     void AtkSword(){
+        OnSword();
         if(isJump){
             anim.SetBool("Sword",true);
             jumpSword.enabled = true;
@@ -375,8 +325,8 @@ public class Player : MonoBehaviour{
     }
     
     void AtkHammer(){
+        OnHammmer();
         if(isJump){
-            // anim.SetBool("isJump",true);
             anim.SetBool("Hammer",true);
         }
         if(!isJump){
@@ -387,21 +337,18 @@ public class Player : MonoBehaviour{
         }
     }
     IEnumerator Delay(){
-        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.4f);
-            rigid.velocity = Vector2.zero;
-        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.6f);
+        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.3f);
+        rigid.velocity = Vector2.zero;
         
-        if(anim.GetCurrentAnimatorStateInfo(0).IsName("SwingHam")){
-            HammerCollider.enabled = false;
-        } 
-        if(anim.GetCurrentAnimatorStateInfo(0).IsName("noSWD")){
-            SwordCollider.enabled = false;
-        } else{
-
-        }
+        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.7f);
         isMove = false;
+
+
+        yield return new WaitUntil(() => anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9f);
+        onHand();
     }
     void AtkArrow(){
+        OnBow();
         isMove = true;
         StartCoroutine("Delay");
         CreateBullet();
@@ -448,6 +395,11 @@ public class Player : MonoBehaviour{
         Sword.SetActive(false);
         Hammer.SetActive(false);
         Bow.SetActive(true);
+    }
+    void onHand(){
+        Sword.SetActive(false);
+        Hammer.SetActive(false);
+        Bow.SetActive(false);
     }
     IEnumerator HammerCooldown(){
         if(anim.GetBool("isJump")){
